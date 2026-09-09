@@ -1,7 +1,7 @@
 {
-  "name": "choyang-im-family-tree",
+  "name": "choyang-lim-family-tree",
   "version": "1.0.0",
-  "description": "Choyang Im Clan Genealogy, Family Tree Hierarchy & Global Map Web App",
+  "description": "Choyang Lim Clan Genealogy, Family Tree Hierarchy & Global Map Web App",
   "main": "index.html",
   "scripts": {
     "start": "npx serve ."
@@ -9,7 +9,7 @@
   "keywords": [
     "family-tree",
     "genealogy",
-    "choyang-im",
+    "choyang-lim",
     "leaflet",
     "korean-clan"
   ],

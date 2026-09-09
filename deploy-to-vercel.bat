@@ -1,8 +1,8 @@
 @echo off
-title Deploy Choyang Im Family Tree to Vercel
+title Deploy Choyang Lim Family Tree to Vercel
 color 0b
 echo ================================================================
-echo    🚀 CHOYANG IM FAMILY TREE - VERCEL ONE-CLICK DEPLOYMENT
+echo    🚀 CHOYANG LIM FAMILY TREE - VERCEL ONE-CLICK DEPLOYMENT
 echo ================================================================
 echo.
 cd /d "i:\AntigravityWorkspace\Family Tree"
