@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="ko">
+<html lang="ko" class="theme-royal">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -24,7 +24,7 @@
 <body>
 
   <!-- ==========================================================================
-       1. 사이트 헤더 (가문 엠블럼, 한/영 전환, 어르신 글자크기 토글, 주요 액션)
+       1. 사이트 헤더 (엠블럼, 3가지 디자인 테마, 한/영 전환, 글자크기, 액션)
        ========================================================================== -->
   <header class="site-header">
     <div class="container header-inner">
@@ -41,8 +41,21 @@
         </div>
       </div>
 
-      <!-- 우측 액션: 언어 토글, 어르신 글자 크기 조정, 버튼 그룹 -->
+      <!-- 우측 컨트롤: 3가지 디자인 테마, 언어 토글, 어르신 글자 크기, 액션 버튼 -->
       <div class="header-actions">
+        <!-- ★ 사용자 요청: 3가지 디자인 테마 토글 스위치 (클래식 / 파스텔 / 다크) -->
+        <div class="theme-toggle-widget" role="group" aria-label="디자인 테마 선택">
+          <button type="button" class="theme-btn active" id="theme-btn-royal" onclick="window.app.setTheme('royal')" title="클래식 로얄 골드 테마">
+            👑 <span data-i18n="themeClassic">클래식</span>
+          </button>
+          <button type="button" class="theme-btn" id="theme-btn-pastel" onclick="window.app.setTheme('pastel')" title="모던 파스텔 세이지 테마">
+            🌿 <span data-i18n="themePastel">파스텔</span>
+          </button>
+          <button type="button" class="theme-btn" id="theme-btn-dark" onclick="window.app.setTheme('dark')" title="미드나잇 옵시디언 다크 테마">
+            🌙 <span data-i18n="themeDark">다크</span>
+          </button>
+        </div>
+
         <!-- 한글 / 영어 (KO / EN) 전환 스위치 -->
         <div class="lang-toggle-widget" role="group" aria-label="언어 선택 / Language Selection">
           <button type="button" class="lang-btn active" id="lang-btn-ko" onclick="window.app.setLanguage('ko')" title="한국어로 보기">
@@ -106,7 +119,6 @@
 
   <!-- ==========================================================================
        3. 7대 핵심 거점 돋보임 (Spotlight Section)
-       (대한민국 전주, 용인 / 캐나다 토론토 / 미국 SF, 버클리, 팔로알토, LA)
        ========================================================================== -->
   <section class="spotlight-section">
     <div class="container">
@@ -159,7 +171,7 @@
           <!-- 실시간 검색 -->
           <div class="search-box">
             <i class="fa-solid fa-magnifying-glass search-icon"></i>
-            <input type="text" id="search-input" placeholder="성명, 도시, 직장, 이메일 검색..." data-i18n-placeholder="searchPlaceholder" aria-label="친척 검색">
+            <input type="text" id="search-input" placeholder="성명, 도시, 직장, 이메일, SNS 검색..." data-i18n-placeholder="searchPlaceholder" aria-label="친척 검색">
           </div>
 
           <!-- 국가 선택 필터 -->
@@ -193,7 +205,6 @@
             <button type="button" class="map-link-chip" onclick="window.app.mapManager.viewNorthAmerica()" data-i18n="mapNorthAmerica">북미 (미국/캐나다)</button>
           </div>
         </div>
-        <!-- 지도 컨테이너 -->
         <div id="clan-leaflet-map"></div>
       </section>
 
@@ -223,7 +234,6 @@
             </button>
           </div>
         </div>
-        <!-- 가계도 렌더링 캔버스 -->
         <div class="tree-canvas-container" id="clan-tree-canvas">
           <!-- tree.js에 의해 동적으로 주입됨 -->
         </div>
@@ -248,17 +258,14 @@
           </div>
         </div>
 
-        <!-- 1) 카드 그리드 뷰 컨테이너 -->
         <div class="relatives-grid" id="relatives-grid-container">
           <!-- 동적 카드 주입 -->
         </div>
 
-        <!-- 2) 테이블 뷰 컨테이너 -->
         <div id="relatives-table-container" style="display:none;">
           <!-- 동적 테이블 주입 -->
         </div>
 
-        <!-- 검색 결과 없음 (Empty State) -->
         <div class="empty-state" id="relatives-empty-state" style="display:none;">
           <div class="empty-icon"><i class="fa-regular fa-folder-open"></i></div>
           <div class="empty-title" data-i18n="emptyTitle">조건에 일치하는 친척 정보가 없습니다.</div>
@@ -273,20 +280,46 @@
   </main>
 
   <!-- ==========================================================================
-       5. 친척 인적사항 등록 / 수정 폼 모달
+       5. 친척 인적사항 등록 / 수정 폼 모달 (사진 & SNS 포함)
        ========================================================================== -->
   <div class="modal-backdrop" id="relative-edit-modal" role="dialog" aria-modal="true" aria-labelledby="modal-title-text">
     <div class="modal-dialog">
       <div class="modal-header">
         <div class="modal-title-box">
           <h3 id="modal-title-text" data-i18n="modalAddTitle">새로운 친척 인적사항 등록</h3>
-          <p id="modal-sub-text" data-i18n="modalAddSub">이름과 이메일은 필수이며, 가계도 연동을 위해 마지막에 부모 성명을 입력해 주세요.</p>
+          <p id="modal-sub-text" data-i18n="modalAddSub">이름과 이메일은 필수이며, 사진과 SNS 등 원하시는 정보를 자유롭게 입력하세요.</p>
         </div>
         <button type="button" class="modal-close-btn" onclick="window.app.closeModal('relative-edit-modal')" aria-label="닫기">&times;</button>
       </div>
 
       <form id="relative-form" onsubmit="return window.app.saveRelativeForm(event)">
         <div class="modal-body">
+          
+          <!-- ★ 프로필 사진 업로드 영역 (선택) -->
+          <div class="photo-uploader-box">
+            <div class="photo-preview-avatar" id="form-photo-preview">
+              <span id="form-photo-preview-char">林</span>
+            </div>
+            <div class="photo-uploader-content">
+              <div style="font-weight:700; font-size:0.92rem; color:var(--color-text-main);">
+                <span data-i18n="formPhoto">프로필 사진</span> <span class="opt-badge" data-i18n="badgeOptional">(선택)</span>
+              </div>
+              <p style="font-size:0.8rem; color:var(--color-text-muted);" data-i18n="formPhotoHelper">
+                친척분의 인물 사진을 등록하면 가계도와 명부 카드에 멋지게 표시됩니다.
+              </p>
+              <div class="photo-uploader-actions">
+                <label class="btn-upload-file">
+                  <i class="fa-solid fa-camera"></i> <span data-i18n="formPhotoUpload">사진 선택</span>
+                  <input type="file" id="form-photo-file" accept="image/*" style="display:none;" onchange="window.app.handlePhotoUpload(event)">
+                </label>
+                <input type="text" id="form-photo-url" class="form-control" style="width:200px; padding:0.35rem 0.6rem; font-size:0.8rem;" placeholder="또는 이미지 URL 입력..." oninput="window.app.handlePhotoUrlInput(event)">
+                <button type="button" class="btn-photo-remove" id="btn-remove-photo" style="display:none;" onclick="window.app.removePhoto()">
+                  <i class="fa-solid fa-trash-can"></i> <span data-i18n="formPhotoRemove">삭제</span>
+                </button>
+              </div>
+            </div>
+          </div>
+
           <div class="form-grid">
             <!-- 필수: 이름 (성명) -->
             <div class="form-group">
@@ -387,7 +420,7 @@
               <input type="text" id="form-work-address" class="form-control" placeholder="직장 소재지 주소">
             </div>
 
-            <!-- 선택: 기타 항목 (메모/항렬/가계 관계) -->
+            <!-- 선택: 기타 항목 -->
             <div class="form-group full-width">
               <label class="form-label" for="form-notes">
                 <span data-i18n="formNotes">기타 항목 (항렬, 촌수/가계 관계, 특이사항 메모)</span> <span class="opt-badge" data-i18n="badgeOptional">(선택)</span>
@@ -395,7 +428,41 @@
               <textarea id="form-notes" class="form-control" rows="2" placeholder="예: 29대손, 종친회 활동, 장남, 취미, 특별한 인연 등"></textarea>
             </div>
 
-            <!-- ★ 사용자 요청 핵심 추가: 마지막 부모 성명 입력 필드 (가계도 Hierarchy 다이어그램 연동) -->
+            <!-- ★ 사용자 요청: 각종 SNS & 소셜 계정 입력 (선택) -->
+            <div class="form-group full-width sns-fieldset-box">
+              <div class="sns-fieldset-header">
+                <h4><i class="fa-solid fa-share-nodes" style="color:var(--color-gold);"></i> <span data-i18n="snsSectionTitle">각종 SNS & 소셜 네트워크 (선택)</span></h4>
+                <p data-i18n="snsSectionDesc">인스타그램, 링크드인 등 친족들과 연결될 수 있는 계정을 편하게 남겨주세요.</p>
+              </div>
+              <div class="sns-grid">
+                <div class="sns-input-wrap">
+                  <i class="fa-brands fa-instagram sns-input-icon" style="color:#d6249f;"></i>
+                  <input type="text" id="form-sns-instagram" class="form-control" placeholder="Instagram (@아이디 또는 URL)">
+                </div>
+                <div class="sns-input-wrap">
+                  <i class="fa-brands fa-linkedin sns-input-icon" style="color:#0a66c2;"></i>
+                  <input type="text" id="form-sns-linkedin" class="form-control" placeholder="LinkedIn (프로필 URL)">
+                </div>
+                <div class="sns-input-wrap">
+                  <i class="fa-brands fa-facebook sns-input-icon" style="color:#1877f2;"></i>
+                  <input type="text" id="form-sns-facebook" class="form-control" placeholder="Facebook (프로필 URL)">
+                </div>
+                <div class="sns-input-wrap">
+                  <i class="fa-brands fa-youtube sns-input-icon" style="color:#ff0000;"></i>
+                  <input type="text" id="form-sns-youtube" class="form-control" placeholder="YouTube (@채널 또는 URL)">
+                </div>
+                <div class="sns-input-wrap">
+                  <i class="fa-brands fa-x-twitter sns-input-icon" style="color:#0f1419;"></i>
+                  <input type="text" id="form-sns-twitter" class="form-control" placeholder="X / Twitter (@아이디)">
+                </div>
+                <div class="sns-input-wrap">
+                  <i class="fa-solid fa-globe sns-input-icon" style="color:#059669;"></i>
+                  <input type="text" id="form-sns-website" class="form-control" placeholder="웹사이트 URL 또는 카카오톡 ID">
+                </div>
+              </div>
+            </div>
+
+            <!-- 부모 성명 입력 필드 (가계도 Hierarchy 다이어그램 연동) -->
             <div class="form-group full-width" style="border-top: 1px dashed var(--color-border); padding-top: 1rem; margin-top: 0.5rem; background: var(--color-gold-soft); padding: 0.85rem; border-radius: var(--radius-sm); border: 1px solid var(--color-border-gold);">
               <label class="form-label" for="form-parent-name" style="color:var(--color-primary); font-size:0.95rem;">
                 <i class="fa-solid fa-people-roof" style="color:var(--color-gold);"></i>
@@ -404,7 +471,7 @@
               </label>
               <input type="text" id="form-parent-name" class="form-control" placeholder="예: 임한식, 임종원, 임성택 등 (기존 등록 친척 자동완성)" list="parent-name-options" autocomplete="off">
               <datalist id="parent-name-options">
-                <!-- app.js에서 친척 목록으로 자동 채움 -->
+                <!-- app.js에서 자동 채움 -->
               </datalist>
               <p class="parent-helper-text" data-i18n="formParentHelper">
                 가계도(Family Tree Hierarchy) 연결에 사용됩니다. 기존 등록된 부모님의 이름을 선택하거나 직접 입력하세요.
@@ -427,22 +494,24 @@
   </div>
 
   <!-- ==========================================================================
-       6. 친척 상세 보기 모달 (어르신 맞춤형 큰 글씨 뷰어)
+       6. 친척 상세 보기 모달 (프로필 사진 포트레이트 & SNS 바로가기)
        ========================================================================== -->
   <div class="modal-backdrop" id="relative-detail-modal" role="dialog" aria-modal="true">
     <div class="modal-dialog detail-modal-dialog">
       <div class="modal-header">
         <div class="modal-title-box">
           <h3 data-i18n="detailTitle">친척 상세 정보 열람</h3>
-          <p data-i18n="detailSub">등록된 인적사항과 가계도 계통을 확인하실 수 있습니다.</p>
+          <p data-i18n="detailSub">등록된 인적사항, 프로필 사진 및 소셜 미디어를 확인하실 수 있습니다.</p>
         </div>
         <button type="button" class="modal-close-btn" onclick="window.app.closeModal('relative-detail-modal')" aria-label="닫기">&times;</button>
       </div>
 
       <div class="modal-body">
-        <!-- 프로필 히어로 영역 -->
+        <!-- 프로필 히어로 영역 (사진 표시 지원) -->
         <div class="detail-profile-hero">
-          <div class="detail-avatar-circle" id="detail-avatar-text">林</div>
+          <div class="detail-avatar-circle" id="detail-avatar-container">
+            <span id="detail-avatar-text">林</span>
+          </div>
           <div class="detail-hero-info">
             <h2 id="detail-name-text">임종원</h2>
             <div class="detail-hero-location" id="detail-location-text">
@@ -486,6 +555,14 @@
           <div class="detail-info-card full-span">
             <span class="detail-card-label"><i class="fa-solid fa-building"></i> <span data-i18n="detailWorkAddressLabel">직장 주소</span></span>
             <div class="detail-card-value" id="detail-work-address">-</div>
+          </div>
+
+          <!-- SNS 채널 표시 영역 -->
+          <div class="detail-info-card full-span" id="detail-sns-section" style="display:none;">
+            <span class="detail-card-label"><i class="fa-solid fa-share-nodes"></i> <span data-i18n="detailSnsLabel">소셜 미디어 (SNS)</span></span>
+            <div class="detail-sns-grid" id="detail-sns-container">
+              <!-- 동적 SNS 버튼 삽입 -->
+            </div>
           </div>
 
           <div class="detail-info-card full-span" style="background:var(--color-gold-soft); border-color:var(--color-border-gold);">

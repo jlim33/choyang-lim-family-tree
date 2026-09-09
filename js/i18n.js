@@ -5,7 +5,7 @@
 
 const I18N_DICTIONARY = {
   ko: {
-    // 헤더
+    // 헤더 & 테마
     brandSub: "CHOYANG IM CLAN GENEALOGY NETWORK",
     brandTitle: "조양 임씨",
     brandHanja: "(兆陽 林氏)",
@@ -14,6 +14,10 @@ const I18N_DICTIONARY = {
     fontLarge: "크게",
     fontXLarge: "아주 크게",
     langLabel: "언어",
+    themeLabel: "디자인",
+    themeClassic: "클래식",
+    themePastel: "파스텔",
+    themeDark: "다크",
     btnAddRelative: "친척 등록하기",
     btnExportExcel: "엑셀 저장",
     btnBackup: "백업",
@@ -42,7 +46,7 @@ const I18N_DICTIONARY = {
     unitCities: "개 도시",
 
     // 검색 및 툴바
-    searchPlaceholder: "성명, 도시, 직장, 이메일 검색...",
+    searchPlaceholder: "성명, 도시, 직장, 이메일, SNS 검색...",
     countryFilterAll: "모든 국가 전체",
     viewCard: "카드",
     viewTable: "목록",
@@ -90,6 +94,7 @@ const I18N_DICTIONARY = {
     thJob: "직장 및 직책",
     thParent: "부모 성명",
     thBirthday: "생년월일",
+    thSns: "SNS 소셜",
     thManage: "관리",
 
     // 카드 및 상세 보기
@@ -106,11 +111,15 @@ const I18N_DICTIONARY = {
 
     // 모달: 등록 / 수정
     modalAddTitle: "새로운 친척 인적사항 등록",
-    modalAddSub: "이름과 이메일은 필수이며, 가계도 연동을 위해 마지막에 부모 성명을 입력해 주세요.",
+    modalAddSub: "이름과 이메일은 필수이며, 사진과 SNS 등 원하시는 정보를 자유롭게 입력하세요.",
     modalEditTitle: "친척 인적사항 수정",
-    modalEditSub: "친척분의 정보를 최신 내용으로 수정합니다.",
+    modalEditSub: "친척분의 사진, SNS 및 프로필 정보를 수정합니다.",
 
-    // 폼 필드 라벨
+    // 폼 필드 라벨 (사진 & SNS 포함)
+    formPhoto: "프로필 사진",
+    formPhotoUpload: "사진 선택",
+    formPhotoRemove: "사진 제거",
+    formPhotoHelper: "친척분의 인물 사진을 등록하면 가계도와 명부 카드에 멋지게 표시됩니다.",
     formName: "성명 (이름)",
     formEmail: "이메일 주소",
     formCountry: "거주 국가",
@@ -125,6 +134,16 @@ const I18N_DICTIONARY = {
     formParentName: "부모 성명 (가계도 연결 필수 입력)",
     formParentHelper: "가계도(Family Tree Hierarchy) 연결에 사용됩니다. 기존 등록된 부모님의 이름을 선택하거나 직접 입력하세요.",
 
+    // SNS 필드
+    snsSectionTitle: "각종 SNS & 소셜 네트워크 (선택)",
+    snsSectionDesc: "인스타그램, 링크드인 등 친족들과 연결될 수 있는 계정을 편하게 남겨주세요.",
+    snsInstagram: "인스타그램 (Instagram)",
+    snsLinkedIn: "링크드인 (LinkedIn)",
+    snsFacebook: "페이스북 (Facebook)",
+    snsYouTube: "유튜브 (YouTube)",
+    snsTwitter: "X / 트위터 (X/Twitter)",
+    snsWebsite: "웹사이트 / 카카오톡",
+
     badgeRequired: "*필수",
     badgeOptional: "(선택)",
     quickHubsLabel: "7대거점:",
@@ -138,7 +157,7 @@ const I18N_DICTIONARY = {
 
     // 상세 모달
     detailTitle: "친척 상세 정보 열람",
-    detailSub: "등록된 인적사항과 가계도 계통을 확인하실 수 있습니다.",
+    detailSub: "등록된 인적사항, 프로필 사진 및 소셜 미디어를 확인하실 수 있습니다.",
     detailParentLabel: "부모 성명 (가계도)",
     detailEmailLabel: "이메일 주소",
     detailPhoneLabel: "연락처 (전화번호)",
@@ -146,6 +165,7 @@ const I18N_DICTIONARY = {
     detailJobLabel: "직장 및 직책",
     detailBirthdayLabel: "생년월일",
     detailWorkAddressLabel: "직장 주소",
+    detailSnsLabel: "소셜 미디어 (SNS)",
     detailNotesLabel: "기타 비고 및 가문 메모",
 
     // 토스트 및 컨펌
@@ -154,6 +174,7 @@ const I18N_DICTIONARY = {
     toastDeleted: "친척분의 정보가 삭제되었습니다.",
     toastFontSizeChanged: "글자 크기가 변경되었습니다.",
     toastLangChanged: "언어가 한국어로 전환되었습니다.",
+    toastThemeChanged: "디자인 테마가 변경되었습니다.",
     toastBackupExported: "족보 데이터 백업 파일(JSON)을 다운로드했습니다.",
     toastCsvExported: "엑셀 호환 CSV 명부를 다운로드했습니다.",
     toastSampleRestored: "초기 가문 친척 데이터로 복원되었습니다.",
@@ -162,7 +183,7 @@ const I18N_DICTIONARY = {
   },
 
   en: {
-    // Header
+    // Header & Themes
     brandSub: "CHOYANG IM CLAN GENEALOGY NETWORK",
     brandTitle: "Choyang Im Clan",
     brandHanja: "(兆陽 林氏)",
@@ -171,6 +192,10 @@ const I18N_DICTIONARY = {
     fontLarge: "Large",
     fontXLarge: "Extra Large",
     langLabel: "Language",
+    themeLabel: "Theme",
+    themeClassic: "Classic",
+    themePastel: "Pastel",
+    themeDark: "Dark",
     btnAddRelative: "Add Relative",
     btnExportExcel: "Excel Export",
     btnBackup: "Backup",
@@ -199,7 +224,7 @@ const I18N_DICTIONARY = {
     unitCities: " Cities",
 
     // Search and Toolbar
-    searchPlaceholder: "Search by name, city, workplace, email...",
+    searchPlaceholder: "Search by name, city, workplace, email, SNS...",
     countryFilterAll: "All Countries",
     viewCard: "Cards",
     viewTable: "Table",
@@ -247,6 +272,7 @@ const I18N_DICTIONARY = {
     thJob: "Workplace & Title",
     thParent: "Parent Name",
     thBirthday: "Date of Birth",
+    thSns: "SNS Channels",
     thManage: "Actions",
 
     // Cards and Detail View
@@ -263,11 +289,15 @@ const I18N_DICTIONARY = {
 
     // Modal: Add / Edit
     modalAddTitle: "Register New Relative",
-    modalAddSub: "Name and email are mandatory. Please enter the Parent's Name at the end to link the Family Tree.",
+    modalAddSub: "Name and email are mandatory. You can optionally add a portrait photo, social media, and parent's name.",
     modalEditTitle: "Edit Relative Information",
-    modalEditSub: "Update the relative's profile information.",
+    modalEditSub: "Update portrait photo, social media, and profile details.",
 
-    // Form Field Labels
+    // Form Field Labels (Photo & SNS)
+    formPhoto: "Profile Photo",
+    formPhotoUpload: "Select Photo",
+    formPhotoRemove: "Remove",
+    formPhotoHelper: "Adding a portrait photo enhances the family tree and directory cards.",
     formName: "Full Name",
     formEmail: "Email Address",
     formCountry: "Country",
@@ -282,6 +312,16 @@ const I18N_DICTIONARY = {
     formParentName: "Parent's Name (Required for Family Tree Hierarchy)",
     formParentHelper: "Used to build the Family Tree Hierarchy. Select an existing relative or type the parent's full name.",
 
+    // SNS Fields
+    snsSectionTitle: "Social Media & SNS Channels (Optional)",
+    snsSectionDesc: "Add Instagram, LinkedIn, or website handles to connect with family members worldwide.",
+    snsInstagram: "Instagram",
+    snsLinkedIn: "LinkedIn",
+    snsFacebook: "Facebook",
+    snsYouTube: "YouTube",
+    snsTwitter: "X / Twitter",
+    snsWebsite: "Website / KakaoTalk",
+
     badgeRequired: "*Required",
     badgeOptional: "(Optional)",
     quickHubsLabel: "7 Hubs:",
@@ -295,7 +335,7 @@ const I18N_DICTIONARY = {
 
     // Detail Modal
     detailTitle: "Relative Detailed Profile",
-    detailSub: "Review complete profile information and family lineage.",
+    detailSub: "Review complete profile information, portrait photo, and social channels.",
     detailParentLabel: "Parent Name (Family Tree)",
     detailEmailLabel: "Email Address",
     detailPhoneLabel: "Phone Number",
@@ -303,6 +343,7 @@ const I18N_DICTIONARY = {
     detailJobLabel: "Workplace & Job Title",
     detailBirthdayLabel: "Date of Birth",
     detailWorkAddressLabel: "Company Address",
+    detailSnsLabel: "Social Media & Networks",
     detailNotesLabel: "Notes & Family Heritage Remarks",
 
     // Toast and Confirm
@@ -311,6 +352,7 @@ const I18N_DICTIONARY = {
     toastDeleted: "Relative record has been deleted.",
     toastFontSizeChanged: "Font size updated.",
     toastLangChanged: "Language switched to English.",
+    toastThemeChanged: "Design theme updated.",
     toastBackupExported: "Family tree backup file (JSON) has been downloaded.",
     toastCsvExported: "Excel-compatible CSV directory has been downloaded.",
     toastSampleRestored: "Restored to initial 7-hub sample dataset.",

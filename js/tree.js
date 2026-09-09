@@ -2,7 +2,7 @@
  * 조양 임씨(兆陽 林氏) 가계도 계통도 다이어그램 모듈
  * Family Tree Hierarchy & Lineage Diagram Engine
  * - 부모-자녀(parentName) 기반의 세대별 계층 트리 자동 구성
- * - 노드 카드 렌더링, 줌/패닝, 검색 하이라이트 및 상세 모달 연동
+ * - 프로필 사진 지원 및 7대 거점 배지 연동
  */
 
 class FamilyTreeManager {
@@ -73,7 +73,6 @@ class FamilyTreeManager {
       return;
     }
 
-    // 1. 이름별 매핑 및 자녀 목록 초기화
     const nameMap = new Map();
     const childrenMap = new Map();
 
@@ -82,7 +81,6 @@ class FamilyTreeManager {
       childrenMap.set(r.name.trim(), []);
     });
 
-    // 2. 부모-자녀 연결
     const roots = [];
     this.relatives.forEach(r => {
       const parent = r.parentName ? r.parentName.trim() : '';
@@ -93,16 +91,13 @@ class FamilyTreeManager {
       }
     });
 
-    // 세대(generation)가 명시된 경우 세대 오름차순 정렬
     roots.sort((a, b) => (a.generation || 99) - (b.generation || 99));
 
-    // 3. 트리 HTML 생성
     const isEn = window.app && window.app.currentLang === 'en';
     const dict = I18N_DICTIONARY[isEn ? 'en' : 'ko'];
 
     let treeHtml = `
       <div class="tree-wrapper" id="tree-render-root">
-        <!-- 가문 최상위 조양 임씨 선조 루트 헤더 -->
         <div class="tree-ancestor-banner">
           <div class="ancestor-crest">林</div>
           <div class="ancestor-text">
@@ -111,7 +106,6 @@ class FamilyTreeManager {
           </div>
         </div>
 
-        <!-- 계통도 브랜치 컨테이너 -->
         <div class="tree-forest">
           ${roots.map(rootNode => this.renderTreeNodeHtml(rootNode, childrenMap, 1)).join('')}
         </div>
@@ -132,15 +126,19 @@ class FamilyTreeManager {
     const hasChildren = children.length > 0;
 
     const isMajor = MAJOR_HUBS.some(h => h.city === node.city);
-    const flag = node.country === '대한민국' ? '🇰🇷' : node.country === '미국' ? '🇺🇸' : node.country === '캐나다' ? '🇨🇦' : '🌐';
+    const flag = node.country === '대한민국' || node.country === 'South Korea' ? '🇰🇷' : node.country === '미국' || node.country === 'USA' ? '🇺🇸' : node.country === '캐나다' || node.country === 'Canada' ? '🇨🇦' : '🌐';
 
-    // 세대 텍스트
     let genBadge = '';
     if (node.generation) {
       genBadge = `${node.generation}${dict.treeGenerationSuffix}`;
     } else {
       genBadge = `${level + 26}${dict.treeGenerationSuffix}`;
     }
+
+    // 아바타: 사진이 있으면 사진, 없으면 성씨 이니셜
+    const avatarContent = node.photo 
+      ? `<img src="${this.escape(node.photo)}" alt="${this.escape(node.name)}" class="tree-node-avatar-img">`
+      : `<span class="tree-node-avatar-txt">${(node.name || '임')[0]}</span>`;
 
     const nodeCardHtml = `
       <div class="tree-node-card ${isMajor ? 'major-hub-node' : ''}" 
@@ -157,7 +155,7 @@ class FamilyTreeManager {
         </div>
 
         <div class="tree-node-body">
-          <div class="tree-node-avatar">${(node.name || '임')[0]}</div>
+          <div class="tree-node-avatar">${avatarContent}</div>
           <div class="tree-node-info">
             <h4 class="tree-node-name">${this.escape(node.name)}</h4>
             <div class="tree-node-loc">
@@ -194,7 +192,6 @@ class FamilyTreeManager {
       `;
     }
 
-    // 자녀가 있는 경우 서브트리 브랜치 구성
     return `
       <div class="tree-branch-item">
         ${nodeCardHtml}
@@ -206,7 +203,6 @@ class FamilyTreeManager {
     `;
   }
 
-  // 가계도 내 검색어 일치 노드 하이라이트
   highlightMatchingNodes() {
     const q = this.searchKeyword;
     const cards = document.querySelectorAll('.tree-node-card');
@@ -226,7 +222,6 @@ class FamilyTreeManager {
       }
     });
 
-    // 첫 번째 일치 노드로 자동 스크롤
     if (q) {
       const firstMatch = document.querySelector('.tree-search-match');
       if (firstMatch) {

@@ -1,22 +1,24 @@
 /**
  * 조양 임씨(兆陽 林氏) 가문 족보 & 친척 관리 메인 애플리케이션
- * - 상태 관리, 필수 유효성 검사 (성명, 이메일) 및 부모 성명 연동
- * - 가계도 계통도(Family Tree Hierarchy) 수형도 다이어그램 연동
- * - 한글 / 영어 (KO / EN) 원클릭 전환 다국어 엔진
- * - 7대 거점 스포트라이트 연동 및 지도 관리
- * - 어르신용 폰트 크기 토글 (LocalStorage 연동)
- * - 데이터 내보내기/가져오기 (JSON, CSV)
+ * - 3가지 디자인 테마 전환 (클래식 골드 / 모던 파스텔 / 미드나잇 다크)
+ * - 프로필 사진(Photo) 업로드 & 실시간 미리보기
+ * - 각종 SNS(Instagram, LinkedIn, Facebook, YouTube, X, Website) 연동
+ * - 부모 성명 기반 가계도 계통도(Family Tree) 연동
+ * - 한글 / 영어(KO / EN) 원클릭 전환
+ * - 7대 거점 스포트라이트 및 인터랙티브 지도
  */
 
 class ChoyangClanApp {
   constructor() {
-    this.STORAGE_KEY = 'choyang_im_clan_relatives_v2';
+    this.STORAGE_KEY = 'choyang_im_clan_relatives_v3';
     this.FONT_KEY = 'choyang_im_font_size_mode';
     this.LANG_KEY = 'choyang_im_lang';
+    this.THEME_KEY = 'choyang_im_theme';
     this.VIEW_KEY = 'choyang_im_view_mode';
 
     this.relatives = [];
     this.currentLang = localStorage.getItem(this.LANG_KEY) || 'ko';
+    this.currentTheme = localStorage.getItem(this.THEME_KEY) || 'royal'; // 'royal' | 'pastel' | 'dark'
     this.currentFilter = {
       keyword: '',
       country: 'all',
@@ -28,6 +30,7 @@ class ChoyangClanApp {
     this.mapManager = null;
     this.treeManager = null;
     this.editingId = null;
+    this.currentPhotoData = ''; // 현재 폼의 사진 Base64 또는 URL
 
     this.init();
   }
@@ -36,27 +39,30 @@ class ChoyangClanApp {
     // 1. 데이터 로드
     this.loadRelativesData();
 
-    // 2. 어르신 글자 크기 모드 복원
+    // 2. 어르신 글자 크기 복원
     this.initFontSizeMode();
 
-    // 3. 지도 및 가계도 매니저 초기화
+    // 3. 3가지 디자인 테마 적용
+    this.setTheme(this.currentTheme, false);
+
+    // 4. 지도 및 가계도 매니저 초기화
     this.mapManager = new ClanMapManager('clan-leaflet-map');
     this.mapManager.init();
 
     this.treeManager = new FamilyTreeManager('clan-tree-canvas');
     this.treeManager.init();
 
-    // 4. 언어 설정 적용
+    // 5. 언어 설정 적용
     this.setLanguage(this.currentLang, false);
 
-    // 5. 이벤트 리스너 등록
+    // 6. 이벤트 바인딩
     this.bindEvents();
 
-    // 6. 화면 렌더링
+    // 7. 전체 렌더링
     this.renderAll();
   }
 
-  // 데이터 로드 (로컬 스토리지 또는 초기 샘플 데이터)
+  // 데이터 로드
   loadRelativesData() {
     try {
       const saved = localStorage.getItem(this.STORAGE_KEY);
@@ -72,9 +78,29 @@ class ChoyangClanApp {
     }
   }
 
-  // 데이터 저장
   saveRelativesData() {
     localStorage.setItem(this.STORAGE_KEY, JSON.stringify(this.relatives));
+  }
+
+  // ★ 3가지 디자인 테마 전환 (royal: 클래식 골드, pastel: 모던 파스텔, dark: 미드나잇 다크)
+  setTheme(themeName, showNotification = true) {
+    const validThemes = ['royal', 'pastel', 'dark'];
+    this.currentTheme = validThemes.includes(themeName) ? themeName : 'royal';
+
+    document.documentElement.classList.remove('theme-royal', 'theme-pastel', 'theme-dark');
+    document.documentElement.classList.add(`theme-${this.currentTheme}`);
+    localStorage.setItem(this.THEME_KEY, this.currentTheme);
+
+    // 테마 토글 버튼 활성화 상태 동기화
+    ['royal', 'pastel', 'dark'].forEach(t => {
+      const btn = document.getElementById(`theme-btn-${t}`);
+      if (btn) btn.classList.toggle('active', t === this.currentTheme);
+    });
+
+    if (showNotification) {
+      const dict = I18N_DICTIONARY[this.currentLang];
+      this.showToast(dict.toastThemeChanged);
+    }
   }
 
   // 다국어 전환 (KO / EN)
@@ -82,16 +108,12 @@ class ChoyangClanApp {
     this.currentLang = lang === 'en' ? 'en' : 'ko';
     localStorage.setItem(this.LANG_KEY, this.currentLang);
 
-    // 버튼 활성화 클래스 동기화
     const koBtn = document.getElementById('lang-btn-ko');
     const enBtn = document.getElementById('lang-btn-en');
     if (koBtn) koBtn.classList.toggle('active', this.currentLang === 'ko');
     if (enBtn) enBtn.classList.toggle('active', this.currentLang === 'en');
 
-    // DOM 번역 적용
     this.applyTranslations();
-
-    // 동적 컴포넌트 재렌더링
     this.renderAll();
 
     if (showNotification) {
@@ -100,12 +122,10 @@ class ChoyangClanApp {
     }
   }
 
-  // DOM 텍스트 번역 치환
   applyTranslations() {
     const dict = I18N_DICTIONARY[this.currentLang];
     if (!dict) return;
 
-    // data-i18n 텍스트 치환
     document.querySelectorAll('[data-i18n]').forEach(el => {
       const key = el.getAttribute('data-i18n');
       if (dict[key]) {
@@ -113,7 +133,6 @@ class ChoyangClanApp {
       }
     });
 
-    // data-i18n-placeholder 치환
     document.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
       const key = el.getAttribute('data-i18n-placeholder');
       if (dict[key]) {
@@ -122,11 +141,10 @@ class ChoyangClanApp {
     });
   }
 
-  // 탭 전환 (지도 뷰 / 가계도 뷰 / 명부 뷰)
+  // 뷰 탭 전환
   switchMainTab(tab) {
     this.currentTab = tab;
 
-    // 탭 버튼 활성화 상태
     const tabMapBtn = document.getElementById('tab-btn-map');
     const tabTreeBtn = document.getElementById('tab-btn-tree');
     const tabDirBtn = document.getElementById('tab-btn-directory');
@@ -135,7 +153,6 @@ class ChoyangClanApp {
     if (tabTreeBtn) tabTreeBtn.classList.toggle('active', tab === 'tree');
     if (tabDirBtn) tabDirBtn.classList.toggle('active', tab === 'directory');
 
-    // 섹션 표시/숨김
     const mapSec = document.getElementById('clan-map-section');
     const treeSec = document.getElementById('clan-tree-section');
     const dirSec = document.getElementById('relatives-section');
@@ -155,7 +172,6 @@ class ChoyangClanApp {
         this.treeManager.render(this.relatives);
       }
     } else {
-      // directory focus
       if (mapSec) mapSec.style.display = 'block';
       if (treeSec) treeSec.style.display = 'none';
       if (dirSec) {
@@ -165,13 +181,12 @@ class ChoyangClanApp {
     }
   }
 
-  // 어르신 글자 크기 초기화
+  // 어르신 글자 크기
   initFontSizeMode() {
     const savedMode = localStorage.getItem(this.FONT_KEY) || 'normal';
     this.setFontSize(savedMode, false);
   }
 
-  // 글자 크기 변경 (normal: 100%, large: 125%, xlarge: 150%)
   setFontSize(mode, showNotification = true) {
     document.body.classList.remove('font-large', 'font-xlarge');
 
@@ -183,13 +198,8 @@ class ChoyangClanApp {
 
     localStorage.setItem(this.FONT_KEY, mode);
 
-    // 버튼 활성화 클래스 동기화
     document.querySelectorAll('.font-toggle-btn').forEach(btn => {
-      if (btn.dataset.size === mode) {
-        btn.classList.add('active');
-      } else {
-        btn.classList.remove('active');
-      }
+      btn.classList.toggle('active', btn.dataset.size === mode);
     });
 
     if (showNotification) {
@@ -200,13 +210,12 @@ class ChoyangClanApp {
       this.showToast(isEn ? `Font size adjusted to ${labels[mode]}` : `글자 크기가 '${labels[mode]}'로 변경되었습니다.`);
     }
 
-    // 지도 크기 재계산
     if (this.mapManager && this.mapManager.map) {
       setTimeout(() => this.mapManager.map.invalidateSize(), 200);
     }
   }
 
-  // 전체 화면 갱신
+  // 화면 갱신
   renderAll() {
     this.renderStats();
     this.renderHubCards();
@@ -222,7 +231,6 @@ class ChoyangClanApp {
     }
   }
 
-  // 상단 통계 요약 갱신
   renderStats() {
     const isEn = this.currentLang === 'en';
     const dict = I18N_DICTIONARY[isEn ? 'en' : 'ko'];
@@ -245,7 +253,6 @@ class ChoyangClanApp {
     if (elHubs) elHubs.textContent = `${majorHubsCount}${dict.unitPeople}`;
   }
 
-  // 7대 거점 스포트라이트 카드 렌더링
   renderHubCards() {
     const container = document.getElementById('spotlight-hubs-grid');
     if (!container) return;
@@ -272,7 +279,6 @@ class ChoyangClanApp {
     }).join('');
   }
 
-  // 7대 거점 카드 클릭 핸들러
   handleHubClick(cityName) {
     if (this.currentFilter.city === cityName) {
       this.clearCityFilter();
@@ -284,7 +290,6 @@ class ChoyangClanApp {
     }
   }
 
-  // 국가 필터 드롭다운 옵션 구성
   updateCountryFilterOptions() {
     const select = document.getElementById('filter-country');
     if (!select) return;
@@ -304,33 +309,28 @@ class ChoyangClanApp {
     select.innerHTML = html;
   }
 
-  // 부모 성명 자동완성 Datalist 갱신
   updateParentNameOptions() {
     const datalist = document.getElementById('parent-name-options');
     if (!datalist) return;
 
-    // 현재 등록된 고유 친척 이름 목록 추출
     const names = Array.from(new Set(this.relatives.map(r => r.name.trim()).filter(Boolean)));
     names.sort();
 
     datalist.innerHTML = names.map(name => `<option value="${this.escapeHtml(name)}">`).join('');
   }
 
-  // 도시 필터 적용
   filterByCity(cityName) {
     this.currentFilter.city = cityName;
     this.updateActiveFilterUI();
     this.renderRelativesList();
     this.renderHubCards();
 
-    // 친척 명부 영역으로 스크롤 이동
     const target = document.getElementById('relatives-section');
     if (target) {
       target.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
   }
 
-  // 도시 필터 해제
   clearCityFilter() {
     this.currentFilter.city = 'all';
     this.updateActiveFilterUI();
@@ -341,7 +341,6 @@ class ChoyangClanApp {
     }
   }
 
-  // 활성 필터 배지 표시 갱신
   updateActiveFilterUI() {
     const badgeContainer = document.getElementById('active-filter-container');
     if (!badgeContainer) return;
@@ -376,7 +375,49 @@ class ChoyangClanApp {
     this.renderRelativesList();
   }
 
-  // 친척 목록 필터링 및 렌더링
+  // ★ 사진 파일 업로드 처리 (FileReader Base64 변환)
+  handlePhotoUpload(event) {
+    const file = event.target.files && event.target.files[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      this.currentPhotoData = e.target.result;
+      this.updatePhotoPreview(this.currentPhotoData);
+    };
+    reader.readAsDataURL(file);
+  }
+
+  handlePhotoUrlInput(event) {
+    const url = event.target.value.trim();
+    this.currentPhotoData = url;
+    this.updatePhotoPreview(url);
+  }
+
+  removePhoto() {
+    this.currentPhotoData = '';
+    const fileInput = document.getElementById('form-photo-file');
+    const urlInput = document.getElementById('form-photo-url');
+    if (fileInput) fileInput.value = '';
+    if (urlInput) urlInput.value = '';
+    this.updatePhotoPreview('');
+  }
+
+  updatePhotoPreview(photoUrl) {
+    const previewContainer = document.getElementById('form-photo-preview');
+    const removeBtn = document.getElementById('btn-remove-photo');
+    if (!previewContainer) return;
+
+    if (photoUrl) {
+      previewContainer.innerHTML = `<img src="${this.escapeHtml(photoUrl)}" alt="Preview">`;
+      if (removeBtn) removeBtn.style.display = 'inline-flex';
+    } else {
+      previewContainer.innerHTML = `<span id="form-photo-preview-char">林</span>`;
+      if (removeBtn) removeBtn.style.display = 'none';
+    }
+  }
+
+  // 친척 명부 필터링 및 렌더링
   renderRelativesList() {
     const containerCards = document.getElementById('relatives-grid-container');
     const containerTable = document.getElementById('relatives-table-container');
@@ -394,7 +435,8 @@ class ChoyangClanApp {
         return false;
       }
       if (q) {
-        const fullText = `${item.name || ''} ${item.parentName || ''} ${item.email || ''} ${item.phone || ''} ${item.city || ''} ${item.country || ''} ${item.workplace || ''} ${item.jobTitle || ''} ${item.notes || ''}`.toLowerCase();
+        const snsValues = item.sns ? Object.values(item.sns).join(' ') : '';
+        const fullText = `${item.name || ''} ${item.parentName || ''} ${item.email || ''} ${item.phone || ''} ${item.city || ''} ${item.country || ''} ${item.workplace || ''} ${item.jobTitle || ''} ${item.notes || ''} ${snsValues}`.toLowerCase();
         if (!fullText.includes(q)) return false;
       }
       return true;
@@ -427,24 +469,57 @@ class ChoyangClanApp {
     }
   }
 
-  // 카드 HTML 생성
+  // ★ 카드 HTML 생성 (사진 및 SNS 칩 포함)
   createCardHtml(rel) {
     const isEn = this.currentLang === 'en';
     const dict = I18N_DICTIONARY[isEn ? 'en' : 'ko'];
 
     const isMajor = MAJOR_HUBS.some(h => h.city === rel.city);
-    const flag = rel.country === '대한민국' ? '🇰🇷' : rel.country === '미국' ? '🇺🇸' : rel.country === '캐나다' ? '🇨🇦' : '🌐';
+    const flag = rel.country === '대한민국' || rel.country === 'South Korea' ? '🇰🇷' : rel.country === '미국' || rel.country === 'USA' ? '🇺🇸' : rel.country === '캐나다' || rel.country === 'Canada' ? '🇨🇦' : '🌐';
+
+    // 프로필 아바타 (사진 또는 성씨)
+    const avatarHtml = rel.photo 
+      ? `<img src="${this.escapeHtml(rel.photo)}" alt="${this.escapeHtml(rel.name)}" class="card-photo-img">`
+      : `<span>${(rel.name || '임')[0]}</span>`;
+
+    // SNS 칩스 생성
+    const sns = rel.sns || {};
+    let snsChipsHtml = '';
+    const snsList = [];
+    if (sns.instagram) snsList.push({ icon: 'fa-brands fa-instagram', class: 'instagram', url: sns.instagram.startsWith('http') ? sns.instagram : `https://instagram.com/${sns.instagram.replace('@', '')}`, title: 'Instagram' });
+    if (sns.linkedin) snsList.push({ icon: 'fa-brands fa-linkedin-in', class: 'linkedin', url: sns.linkedin.startsWith('http') ? sns.linkedin : `https://linkedin.com/in/${sns.linkedin}`, title: 'LinkedIn' });
+    if (sns.facebook) snsList.push({ icon: 'fa-brands fa-facebook-f', class: 'facebook', url: sns.facebook.startsWith('http') ? sns.facebook : `https://facebook.com/${sns.facebook}`, title: 'Facebook' });
+    if (sns.youtube) snsList.push({ icon: 'fa-brands fa-youtube', class: 'youtube', url: sns.youtube.startsWith('http') ? sns.youtube : `https://youtube.com/${sns.youtube}`, title: 'YouTube' });
+    if (sns.twitter) snsList.push({ icon: 'fa-brands fa-x-twitter', class: 'twitter', url: sns.twitter.startsWith('http') ? sns.twitter : `https://twitter.com/${sns.twitter.replace('@', '')}`, title: 'X / Twitter' });
+    if (sns.website) snsList.push({ icon: 'fa-solid fa-globe', class: 'website', url: sns.website.startsWith('http') ? sns.website : `https://${sns.website}`, title: 'Website / Social' });
+
+    if (snsList.length > 0) {
+      snsChipsHtml = `
+        <div class="card-sns-chips">
+          ${snsList.map(s => `
+            <a href="${this.escapeHtml(s.url)}" target="_blank" rel="noopener noreferrer" class="card-sns-chip ${s.class}" title="${s.title}">
+              <i class="${s.icon}"></i>
+            </a>
+          `).join('')}
+        </div>
+      `;
+    }
 
     return `
       <div class="relative-card">
         <div>
           <div class="card-top">
-            <div class="card-person-info">
-              <div class="card-name">${this.escapeHtml(rel.name)}</div>
-              <div class="card-location-badge ${isMajor ? 'hub-spotlight' : ''}">
-                <span>${flag}</span>
-                <span>${rel.country || (isEn ? 'Global' : '국가 미지정')} · ${rel.city || (isEn ? 'Undisclosed' : '도시 미지정')}</span>
-                ${isMajor ? `<span style="font-size:0.7rem;">(${dict.hubSpotlightBadge})</span>` : ''}
+            <div class="card-person-header">
+              <div class="card-photo-avatar">
+                ${avatarHtml}
+              </div>
+              <div class="card-person-info">
+                <div class="card-name">${this.escapeHtml(rel.name)}</div>
+                <div class="card-location-badge ${isMajor ? 'hub-spotlight' : ''}">
+                  <span>${flag}</span>
+                  <span>${rel.country || (isEn ? 'Global' : '국가 미지정')} · ${rel.city || (isEn ? 'Undisclosed' : '도시 미지정')}</span>
+                  ${isMajor ? `<span style="font-size:0.7rem;">(${dict.hubSpotlightBadge})</span>` : ''}
+                </div>
               </div>
             </div>
             <div class="card-actions-dropdown">
@@ -486,6 +561,8 @@ class ChoyangClanApp {
               </div>
             ` : ''}
           </div>
+
+          ${snsChipsHtml}
         </div>
 
         <div class="card-footer">
@@ -516,6 +593,7 @@ class ChoyangClanApp {
               <th>${dict.thEmail}</th>
               <th>${dict.thPhone}</th>
               <th>${dict.thJob}</th>
+              <th>${dict.thSns}</th>
               <th>${dict.thBirthday}</th>
               <th style="text-align:right;">${dict.thManage}</th>
             </tr>
@@ -523,11 +601,24 @@ class ChoyangClanApp {
           <tbody>
             ${relatives.map(rel => {
               const isMajor = MAJOR_HUBS.some(h => h.city === rel.city);
-              const flag = rel.country === '대한민국' ? '🇰🇷' : rel.country === '미국' ? '🇺🇸' : rel.country === '캐나다' ? '🇨🇦' : '🌐';
+              const flag = rel.country === '대한민국' || rel.country === 'South Korea' ? '🇰🇷' : rel.country === '미국' || rel.country === 'USA' ? '🇺🇸' : rel.country === '캐나다' || rel.country === 'Canada' ? '🇨🇦' : '🌐';
+              
+              const sns = rel.sns || {};
+              const snsIcons = [];
+              if (sns.instagram) snsIcons.push('<i class="fa-brands fa-instagram" style="color:#d6249f;" title="Instagram"></i>');
+              if (sns.linkedin) snsIcons.push('<i class="fa-brands fa-linkedin-in" style="color:#0a66c2;" title="LinkedIn"></i>');
+              if (sns.facebook) snsIcons.push('<i class="fa-brands fa-facebook-f" style="color:#1877f2;" title="Facebook"></i>');
+              if (sns.youtube) snsIcons.push('<i class="fa-brands fa-youtube" style="color:#ff0000;" title="YouTube"></i>');
+              if (sns.twitter) snsIcons.push('<i class="fa-brands fa-x-twitter" style="color:#000000;" title="X"></i>');
+              if (sns.website) snsIcons.push('<i class="fa-solid fa-globe" style="color:#059669;" title="Web"></i>');
+
               return `
                 <tr>
                   <td>
-                    <strong>${this.escapeHtml(rel.name)}</strong>
+                    <div style="display:flex; align-items:center; gap:0.5rem;">
+                      ${rel.photo ? `<img src="${this.escapeHtml(rel.photo)}" alt="" style="width:28px; height:28px; border-radius:50%; object-fit:cover;">` : ''}
+                      <strong>${this.escapeHtml(rel.name)}</strong>
+                    </div>
                   </td>
                   <td>
                     <span>${flag} ${rel.country || '-'} / <strong>${rel.city || '-'}</strong></span>
@@ -539,6 +630,11 @@ class ChoyangClanApp {
                   <td>${this.escapeHtml(rel.email)}</td>
                   <td>${this.escapeHtml(rel.phone || '-')}</td>
                   <td>${this.escapeHtml([rel.workplace, rel.jobTitle].filter(Boolean).join(' / ') || '-')}</td>
+                  <td>
+                    <div style="display:flex; gap:0.3rem;">
+                      ${snsIcons.length > 0 ? snsIcons.join(' ') : '<span style="color:#94a3b8;">-</span>'}
+                    </div>
+                  </td>
                   <td>${this.escapeHtml(rel.birthday || '-')}</td>
                   <td style="text-align:right; white-space:nowrap;">
                     <button class="btn-icon-sm" style="display:inline-flex;" title="${dict.btnViewDetail}" onclick="window.app.openDetailModal('${rel.id}')">
@@ -560,7 +656,6 @@ class ChoyangClanApp {
     `;
   }
 
-  // 뷰 모드 전환 (카드 / 표)
   setViewMode(mode) {
     this.currentView = mode;
     localStorage.setItem(this.VIEW_KEY, mode);
@@ -571,7 +666,6 @@ class ChoyangClanApp {
     this.renderRelativesList();
   }
 
-  // 신규 등록 모달 열기
   openAddModal() {
     this.editingId = null;
     const form = document.getElementById('relative-form');
@@ -584,14 +678,23 @@ class ChoyangClanApp {
     document.getElementById('modal-title-text').textContent = dict.modalAddTitle;
     document.getElementById('modal-sub-text').textContent = dict.modalAddSub;
     
-    document.getElementById('form-country').value = isEn ? '대한민국' : '대한민국';
+    document.getElementById('form-country').value = '대한민국';
     document.getElementById('form-parent-name').value = '';
+
+    // 사진 및 SNS 초기화
+    this.currentPhotoData = '';
+    this.updatePhotoPreview('');
+    document.getElementById('form-sns-instagram').value = '';
+    document.getElementById('form-sns-linkedin').value = '';
+    document.getElementById('form-sns-facebook').value = '';
+    document.getElementById('form-sns-youtube').value = '';
+    document.getElementById('form-sns-twitter').value = '';
+    document.getElementById('form-sns-website').value = '';
 
     this.updateParentNameOptions();
     this.showModal('relative-edit-modal');
   }
 
-  // 수정 모달 열기
   openEditModal(id) {
     const rel = this.relatives.find(r => r.id === id);
     if (!rel) return;
@@ -618,11 +721,26 @@ class ChoyangClanApp {
     document.getElementById('form-notes').value = rel.notes || '';
     document.getElementById('form-parent-name').value = rel.parentName || '';
 
+    // 사진 채우기
+    this.currentPhotoData = rel.photo || '';
+    this.updatePhotoPreview(this.currentPhotoData);
+    const photoUrlInput = document.getElementById('form-photo-url');
+    if (photoUrlInput) photoUrlInput.value = rel.photo && rel.photo.startsWith('http') ? rel.photo : '';
+
+    // SNS 채우기
+    const sns = rel.sns || {};
+    document.getElementById('form-sns-instagram').value = sns.instagram || '';
+    document.getElementById('form-sns-linkedin').value = sns.linkedin || '';
+    document.getElementById('form-sns-facebook').value = sns.facebook || '';
+    document.getElementById('form-sns-youtube').value = sns.youtube || '';
+    document.getElementById('form-sns-twitter').value = sns.twitter || '';
+    document.getElementById('form-sns-website').value = sns.website || '';
+
     this.updateParentNameOptions();
     this.showModal('relative-edit-modal');
   }
 
-  // 상세 보기 모달 열기
+  // ★ 상세 보기 모달 (사진 포트레이트 & SNS 바로가기 버튼)
   openDetailModal(id) {
     const rel = this.relatives.find(r => r.id === id);
     if (!rel) return;
@@ -631,9 +749,18 @@ class ChoyangClanApp {
     const dict = I18N_DICTIONARY[isEn ? 'en' : 'ko'];
 
     const isMajor = MAJOR_HUBS.some(h => h.city === rel.city);
-    const flag = rel.country === '대한민국' ? '🇰🇷' : rel.country === '미국' ? '🇺🇸' : rel.country === '캐나다' ? '🇨🇦' : '🌐';
+    const flag = rel.country === '대한민국' || rel.country === 'South Korea' ? '🇰🇷' : rel.country === '미국' || rel.country === 'USA' ? '🇺🇸' : rel.country === '캐나다' || rel.country === 'Canada' ? '🇨🇦' : '🌐';
 
-    document.getElementById('detail-avatar-text').textContent = (rel.name || '임')[0];
+    // 포트레이트 아바타
+    const avatarContainer = document.getElementById('detail-avatar-container');
+    if (avatarContainer) {
+      if (rel.photo) {
+        avatarContainer.innerHTML = `<img src="${this.escapeHtml(rel.photo)}" alt="${this.escapeHtml(rel.name)}" class="detail-avatar-img">`;
+      } else {
+        avatarContainer.innerHTML = `<span id="detail-avatar-text">${(rel.name || '임')[0]}</span>`;
+      }
+    }
+
     document.getElementById('detail-name-text').textContent = rel.name;
     document.getElementById('detail-location-text').innerHTML = `
       <span>${flag}</span>
@@ -649,6 +776,44 @@ class ChoyangClanApp {
     document.getElementById('detail-work-address').textContent = rel.workAddress || dict.notRegistered;
     document.getElementById('detail-birthday').textContent = rel.birthday || dict.notRegistered;
     document.getElementById('detail-notes').textContent = rel.notes || dict.noNotes;
+
+    // SNS 버튼 렌더링
+    const snsSec = document.getElementById('detail-sns-section');
+    const snsContainer = document.getElementById('detail-sns-container');
+    const sns = rel.sns || {};
+    const snsButtons = [];
+
+    if (sns.instagram) {
+      const url = sns.instagram.startsWith('http') ? sns.instagram : `https://instagram.com/${sns.instagram.replace('@', '')}`;
+      snsButtons.push(`<a href="${this.escapeHtml(url)}" target="_blank" rel="noopener noreferrer" class="detail-sns-btn instagram"><i class="fa-brands fa-instagram"></i> Instagram</a>`);
+    }
+    if (sns.linkedin) {
+      const url = sns.linkedin.startsWith('http') ? sns.linkedin : `https://linkedin.com/in/${sns.linkedin}`;
+      snsButtons.push(`<a href="${this.escapeHtml(url)}" target="_blank" rel="noopener noreferrer" class="detail-sns-btn linkedin"><i class="fa-brands fa-linkedin-in"></i> LinkedIn</a>`);
+    }
+    if (sns.facebook) {
+      const url = sns.facebook.startsWith('http') ? sns.facebook : `https://facebook.com/${sns.facebook}`;
+      snsButtons.push(`<a href="${this.escapeHtml(url)}" target="_blank" rel="noopener noreferrer" class="detail-sns-btn facebook"><i class="fa-brands fa-facebook-f"></i> Facebook</a>`);
+    }
+    if (sns.youtube) {
+      const url = sns.youtube.startsWith('http') ? sns.youtube : `https://youtube.com/${sns.youtube}`;
+      snsButtons.push(`<a href="${this.escapeHtml(url)}" target="_blank" rel="noopener noreferrer" class="detail-sns-btn youtube"><i class="fa-brands fa-youtube"></i> YouTube</a>`);
+    }
+    if (sns.twitter) {
+      const url = sns.twitter.startsWith('http') ? sns.twitter : `https://twitter.com/${sns.twitter.replace('@', '')}`;
+      snsButtons.push(`<a href="${this.escapeHtml(url)}" target="_blank" rel="noopener noreferrer" class="detail-sns-btn twitter"><i class="fa-brands fa-x-twitter"></i> X / Twitter</a>`);
+    }
+    if (sns.website) {
+      const url = sns.website.startsWith('http') ? sns.website : `https://${sns.website}`;
+      snsButtons.push(`<a href="${this.escapeHtml(url)}" target="_blank" rel="noopener noreferrer" class="detail-sns-btn website"><i class="fa-solid fa-globe"></i> Website / Kakao</a>`);
+    }
+
+    if (snsButtons.length > 0) {
+      snsContainer.innerHTML = snsButtons.join('');
+      snsSec.style.display = 'block';
+    } else {
+      snsSec.style.display = 'none';
+    }
 
     const flyBtn = document.getElementById('detail-fly-map-btn');
     if (flyBtn) {
@@ -670,7 +835,7 @@ class ChoyangClanApp {
     this.showModal('relative-detail-modal');
   }
 
-  // 폼 저장 처리 (필수 항목 및 부모 성명 검증)
+  // 폼 저장
   saveRelativeForm(e) {
     if (e) e.preventDefault();
 
@@ -685,13 +850,11 @@ class ChoyangClanApp {
     this.clearValidationErrors();
     let hasError = false;
 
-    // 1. 필수 성명(이름) 검증
     if (!nameVal) {
       this.showFieldError('form-name', 'name-error', dict.errNameRequired);
       hasError = true;
     }
 
-    // 2. 필수 이메일 주소 검증
     if (!emailVal) {
       this.showFieldError('form-email', 'email-error', dict.errEmailRequired);
       hasError = true;
@@ -704,9 +867,20 @@ class ChoyangClanApp {
       return false;
     }
 
+    // SNS 수집
+    const snsData = {
+      instagram: document.getElementById('form-sns-instagram').value.trim(),
+      linkedin: document.getElementById('form-sns-linkedin').value.trim(),
+      facebook: document.getElementById('form-sns-facebook').value.trim(),
+      youtube: document.getElementById('form-sns-youtube').value.trim(),
+      twitter: document.getElementById('form-sns-twitter').value.trim(),
+      website: document.getElementById('form-sns-website').value.trim()
+    };
+
     const relativeData = {
       name: nameVal,
       email: emailVal,
+      photo: this.currentPhotoData || '',
       country: document.getElementById('form-country').value.trim() || '대한민국',
       city: document.getElementById('form-city').value.trim(),
       phone: document.getElementById('form-phone').value.trim(),
@@ -717,6 +891,7 @@ class ChoyangClanApp {
       birthday: document.getElementById('form-birthday').value.trim(),
       notes: document.getElementById('form-notes').value.trim(),
       parentName: document.getElementById('form-parent-name').value.trim(),
+      sns: snsData,
       updatedAt: new Date().toISOString()
     };
 
@@ -740,7 +915,6 @@ class ChoyangClanApp {
     this.closeModal('relative-edit-modal');
     this.renderAll();
 
-    // 입력한 도시로 지도 안내
     if (relativeData.city && this.mapManager && this.currentTab === 'map') {
       this.mapManager.flyToCity(relativeData.city);
     }
@@ -748,7 +922,6 @@ class ChoyangClanApp {
     return true;
   }
 
-  // 친척 정보 삭제
   deleteRelative(id) {
     const rel = this.relatives.find(r => r.id === id);
     if (!rel) return;
@@ -812,7 +985,7 @@ class ChoyangClanApp {
 
     const toast = document.createElement('div');
     toast.className = 'toast';
-    toast.innerHTML = `<i class="fa-solid fa-circle-check" style="color:#c59b27;"></i> <span>${this.escapeHtml(message)}</span>`;
+    toast.innerHTML = `<i class="fa-solid fa-circle-check" style="color:var(--color-gold);"></i> <span>${this.escapeHtml(message)}</span>`;
     container.appendChild(toast);
 
     setTimeout(() => {
@@ -822,12 +995,11 @@ class ChoyangClanApp {
     }, 3500);
   }
 
-  // JSON 백업 다운로드
   exportJSON() {
     const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(this.relatives, null, 2));
     const dlAnchor = document.createElement('a');
     dlAnchor.setAttribute("href", dataStr);
-    dlAnchor.setAttribute("download", `choyang_im_clan_family_tree_${new Date().toISOString().slice(0, 10)}.json`);
+    dlAnchor.setAttribute("download", `choyang_lim_clan_family_tree_${new Date().toISOString().slice(0, 10)}.json`);
     dlAnchor.click();
     dlAnchor.remove();
 
@@ -836,7 +1008,6 @@ class ChoyangClanApp {
     this.showToast(dict.toastBackupExported);
   }
 
-  // JSON 백업 복원
   importJSON(file) {
     if (!file) return;
     const reader = new FileReader();
@@ -858,23 +1029,26 @@ class ChoyangClanApp {
     reader.readAsText(file);
   }
 
-  // 엑셀 호환 CSV 내보내기 (부모 성명 포함)
   exportCSV() {
     const isEn = this.currentLang === 'en';
     const dict = I18N_DICTIONARY[isEn ? 'en' : 'ko'];
 
-    const headers = [dict.thName, dict.thLocation, dict.thParent, dict.thEmail, dict.thPhone, dict.formAddress, dict.thJob, dict.thBirthday, dict.detailNotesLabel];
-    const rows = this.relatives.map(r => [
-      r.name || '',
-      `${r.country || ''} ${r.city || ''}`.trim(),
-      r.parentName || '',
-      r.email || '',
-      r.phone || '',
-      r.address || '',
-      [r.workplace, r.jobTitle].filter(Boolean).join(' / '),
-      r.birthday || '',
-      (r.notes || '').replace(/"/g, '""')
-    ]);
+    const headers = [dict.thName, dict.thLocation, dict.thParent, dict.thEmail, dict.thPhone, dict.formAddress, dict.thJob, dict.thBirthday, 'SNS Channels', dict.detailNotesLabel];
+    const rows = this.relatives.map(r => {
+      const sns = r.sns ? Object.entries(r.sns).filter(([k, v]) => v).map(([k, v]) => `${k}:${v}`).join('; ') : '';
+      return [
+        r.name || '',
+        `${r.country || ''} ${r.city || ''}`.trim(),
+        r.parentName || '',
+        r.email || '',
+        r.phone || '',
+        r.address || '',
+        [r.workplace, r.jobTitle].filter(Boolean).join(' / '),
+        r.birthday || '',
+        sns,
+        (r.notes || '').replace(/"/g, '""')
+      ];
+    });
 
     let csvContent = '\uFEFF';
     csvContent += headers.map(h => `"${h}"`).join(',') + '\r\n';
@@ -886,14 +1060,13 @@ class ChoyangClanApp {
     const url = URL.createObjectURL(blob);
     const link = document.createElement('a');
     link.setAttribute('href', url);
-    link.setAttribute('download', `choyang_im_relatives_${new Date().toISOString().slice(0, 10)}.csv`);
+    link.setAttribute('download', `choyang_lim_relatives_${new Date().toISOString().slice(0, 10)}.csv`);
     link.click();
     URL.revokeObjectURL(url);
     link.remove();
     this.showToast(dict.toastCsvExported);
   }
 
-  // 초기 샘플 복원
   resetToInitial() {
     const isEn = this.currentLang === 'en';
     const dict = I18N_DICTIONARY[isEn ? 'en' : 'ko'];
