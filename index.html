@@ -66,6 +66,42 @@
           </button>
         </div>
 
+        <!-- ★ 클래식 뮤직 라운지 미니 캡슐 플레이어 -->
+        <div class="music-mini-capsule" id="music-mini-capsule" role="region" aria-label="클래식 BGM 플레이어">
+          <div class="music-mini-wave" id="music-mini-wave">
+            <span class="wave-bar wb-1"></span>
+            <span class="wave-bar wb-2"></span>
+            <span class="wave-bar wb-3"></span>
+          </div>
+
+          <button type="button" class="music-mini-btn" id="music-mini-prev-btn" title="이전 곡">
+            <i class="fa-solid fa-backward-step"></i>
+          </button>
+
+          <button type="button" class="music-mini-btn play-btn" id="music-mini-play-btn" title="클래식 BGM 재생">
+            <i class="fa-solid fa-play"></i>
+          </button>
+
+          <button type="button" class="music-mini-btn" id="music-mini-next-btn" title="다음 곡">
+            <i class="fa-solid fa-forward-step"></i>
+          </button>
+
+          <div class="music-mini-track-info" id="music-mini-info-box" title="클릭하여 뮤직 라운지 열기">
+            <div class="music-mini-title" id="music-mini-title">캐논 변주곡 (Canon in D)</div>
+            <div class="music-mini-sub-row">
+              <span class="music-mini-artist" id="music-mini-artist">요한 파헬벨</span>
+              <span class="music-mini-status" id="music-mini-status">
+                <span class="music-idle-dot"></span>
+                <span data-i18n="musicIdleBadge">클래식 명곡 5선</span>
+              </span>
+            </div>
+          </div>
+
+          <button type="button" class="music-mini-btn expand-btn" id="music-mini-expand-btn" title="뮤직 라운지 열기">
+            <i class="fa-solid fa-chevron-down"></i>
+          </button>
+        </div>
+
         <!-- 어르신용 글자 크기 토글 위젯 -->
         <div class="font-size-widget" role="group" aria-label="화면 글자 크기 조정">
           <span class="font-size-label"><i class="fa-solid fa-text-height"></i> <span data-i18n="fontSizeLabel">글자크기</span></span>
@@ -583,6 +619,108 @@
     </div>
   </div>
 
+  <!-- ==========================================================================
+       클래식 뮤직 라운지 상세 모달 (Music Lounge Modal)
+       ========================================================================== -->
+  <div class="modal-backdrop hidden" id="music-lounge-modal" role="dialog" aria-modal="true">
+    <div class="modal-window music-modal-window">
+      <div class="modal-header music-modal-header">
+        <div class="music-header-title-box">
+          <div class="music-badge-pill">
+            <i class="fa-solid fa-music"></i> <span data-i18n="musicLoungeBadge">Classic Best 5선</span>
+          </div>
+          <h2 class="modal-title" style="margin-top:0.35rem;" data-i18n="musicLoungeTitle">
+            🎻 조양 임씨 클래식 뮤직 라운지
+          </h2>
+          <p class="music-header-sub" data-i18n="musicLoungeDesc">
+            선조들의 숭고한 정신과 가문의 화합을 기리는 불멸의 클래식 명곡 마스터 사운드
+          </p>
+        </div>
+        <button type="button" class="modal-close-btn" id="music-modal-close" aria-label="닫기">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+
+      <div class="modal-body music-modal-body">
+        <!-- 상단 플레이어 히어로 카드 -->
+        <div class="music-hero-card">
+          <div class="music-disc-visual">
+            <div class="music-album-art" id="music-modal-album-art">
+              <div class="music-disc-grooves"></div>
+              <div class="music-disc-center">
+                <i class="fa-solid fa-compact-disc"></i>
+              </div>
+            </div>
+          </div>
+
+          <div class="music-hero-meta">
+            <span class="music-track-badge" id="music-modal-track-badge">바로크 현악 명곡 🎻</span>
+            <h3 class="music-current-title" id="music-modal-track-title">캐논 변주곡 (Canon in D)</h3>
+            <p class="music-current-artist" id="music-modal-track-artist">요한 파헬벨 (J. Pachelbel)</p>
+
+            <!-- 타임라인 프로그레스 바 -->
+            <div class="music-progress-wrapper">
+              <div class="music-progress-container" id="music-progress-container">
+                <div class="music-progress-bar" id="music-progress-bar"></div>
+              </div>
+              <div class="music-time-row">
+                <span id="music-time-current">0:00</span>
+                <span id="music-time-total">0:00</span>
+              </div>
+            </div>
+
+            <!-- 메인 플레이어 버튼 그룹 -->
+            <div class="music-controls-row">
+              <button type="button" class="music-ctrl-btn" id="music-modal-shuffle-btn" title="랜덤 셔플">
+                <i class="fa-solid fa-shuffle"></i>
+              </button>
+              <button type="button" class="music-ctrl-btn" id="music-modal-prev-btn" title="이전 곡">
+                <i class="fa-solid fa-backward-step"></i>
+              </button>
+              <button type="button" class="music-ctrl-btn main-play-btn" id="music-modal-play-btn" title="재생/일시정지">
+                <i class="fa-solid fa-play"></i>
+              </button>
+              <button type="button" class="music-ctrl-btn" id="music-modal-next-btn" title="다음 곡">
+                <i class="fa-solid fa-forward-step"></i>
+              </button>
+              <button type="button" class="music-ctrl-btn active" id="music-modal-auto-btn" title="다음 곡 자동 재생">
+                <i class="fa-solid fa-repeat"></i>
+              </button>
+            </div>
+
+            <!-- 볼륨 조절 슬라이더 -->
+            <div class="music-volume-row">
+              <button type="button" class="music-vol-btn" id="music-modal-mute-btn" title="음소거">
+                <i class="fa-solid fa-volume-high"></i>
+              </button>
+              <input type="range" class="music-volume-slider" id="music-volume-slider" min="0" max="1" step="0.05" value="0.75" aria-label="볼륨 조절">
+            </div>
+          </div>
+        </div>
+
+        <!-- 5선 플레이리스트 섹션 -->
+        <div class="music-playlist-section">
+          <div class="music-playlist-header">
+            <h4><i class="fa-solid fa-list-ul"></i> <span data-i18n="musicPlaylistTitle">클래식 5선 명곡 목록</span></h4>
+            <span class="music-playlist-count" data-i18n="musicTrackCount">총 5곡 연속 스트리밍</span>
+          </div>
+          <div class="music-playlist-list" id="music-playlist-list">
+            <!-- 동적 트랙 렌더링 -->
+          </div>
+        </div>
+      </div>
+
+      <div class="modal-footer music-modal-footer">
+        <div class="music-footer-note">
+          <i class="fa-solid fa-circle-info"></i> <span data-i18n="musicFooterTip">가문 족보 열람 및 가계도 탐색 중에도 배경음악이 끊김 없이 연속 재생됩니다.</span>
+        </div>
+        <button type="button" class="btn btn-secondary" onclick="window.musicLounge.toggleModal(false)" data-i18n="btnClose">
+          닫기
+        </button>
+      </div>
+    </div>
+  </div>
+
   <!-- 푸터 -->
   <footer class="site-footer">
     <div class="container footer-inner">
@@ -604,11 +742,12 @@
   <!-- 알림 토스트 컨테이너 -->
   <div class="toast-container" id="toast-container"></div>
 
-  <!-- 스크립트 로드 순서: 사전 -> 데이터 -> 지도 -> 가계도 -> 앱 코어 -->
+  <!-- 스크립트 로드 순서: 사전 -> 데이터 -> 지도 -> 가계도 -> 앱 코어 -> 뮤직 플레이어 -->
   <script src="js/i18n.js"></script>
   <script src="js/data.js"></script>
   <script src="js/map.js"></script>
   <script src="js/tree.js"></script>
   <script src="js/app.js"></script>
+  <script src="js/music-player.js"></script>
 </body>
 </html>

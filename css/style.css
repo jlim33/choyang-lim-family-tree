@@ -2224,3 +2224,681 @@ html.theme-dark .card-location-badge.hub-spotlight {
     align-items: flex-start;
   }
 }
+
+/* ==============================================================================
+   클래식 뮤직 라운지 (Music Lounge - Classic Best 5선) 스타일
+   ============================================================================== */
+
+/* 1. 상단 헤더 미니 캡슐 플레이어 */
+.music-mini-capsule {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  padding: 0.35rem 0.75rem;
+  background: var(--color-bg-card);
+  border: 1px solid var(--color-border);
+  border-radius: 9999px;
+  box-shadow: var(--shadow-sm);
+  backdrop-filter: blur(10px);
+  cursor: pointer;
+  transition: all 0.25s ease;
+  user-select: none;
+  max-width: 320px;
+  position: relative;
+}
+
+.music-mini-capsule:hover {
+  border-color: var(--color-gold);
+  box-shadow: var(--shadow-md);
+  transform: translateY(-1px);
+}
+
+/* 음파 애니메이션 (Wave) */
+.music-mini-wave {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  height: 14px;
+  padding: 0 2px;
+}
+
+.wave-bar {
+  width: 3px;
+  height: 4px;
+  background: var(--color-gold);
+  border-radius: 2px;
+  transition: height 0.2s ease;
+}
+
+.music-mini-wave.playing .wb-1 {
+  animation: miniWaveAnim 0.7s infinite alternate ease-in-out;
+}
+.music-mini-wave.playing .wb-2 {
+  animation: miniWaveAnim 0.5s infinite alternate ease-in-out 0.15s;
+}
+.music-mini-wave.playing .wb-3 {
+  animation: miniWaveAnim 0.8s infinite alternate ease-in-out 0.3s;
+}
+
+@keyframes miniWaveAnim {
+  0% { height: 4px; }
+  100% { height: 14px; }
+}
+
+/* 미니 컨트롤 버튼 */
+.music-mini-btn {
+  width: 1.8rem;
+  height: 1.8rem;
+  border-radius: 50%;
+  border: 1px solid transparent;
+  background: transparent;
+  color: var(--color-text-muted);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.75rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.music-mini-btn:hover {
+  color: var(--color-primary);
+  background: var(--color-bg-subtle);
+}
+
+.music-mini-btn.play-btn {
+  background: var(--gradient-gold);
+  color: #1e1b4b;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  box-shadow: 0 2px 6px rgba(180, 83, 9, 0.25);
+  font-size: 0.8rem;
+}
+
+.music-mini-btn.play-btn:hover {
+  transform: scale(1.08);
+  box-shadow: 0 4px 10px rgba(180, 83, 9, 0.35);
+  color: #000;
+}
+
+.music-mini-btn.expand-btn {
+  color: var(--color-text-muted);
+  font-size: 0.7rem;
+}
+
+/* 트랙 정보 */
+.music-mini-track-info {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  max-width: 140px;
+  padding: 0 0.2rem;
+}
+
+.music-mini-title {
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--color-text-main);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  line-height: 1.2;
+}
+
+.music-mini-sub-row {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  line-height: 1.1;
+  margin-top: 2px;
+}
+
+.music-mini-artist {
+  font-size: 0.68rem;
+  color: var(--color-text-muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.music-mini-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  font-size: 0.65rem;
+  font-weight: 600;
+  color: var(--color-text-muted);
+  white-space: nowrap;
+}
+
+.music-mini-status.playing {
+  color: #10b981;
+}
+
+.music-pulse-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #10b981;
+  box-shadow: 0 0 6px #10b981;
+  animation: pulseDot 1.4s infinite;
+}
+
+.music-idle-dot {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--color-text-muted);
+}
+
+@keyframes pulseDot {
+  0% { transform: scale(0.9); opacity: 0.7; }
+  50% { transform: scale(1.2); opacity: 1; }
+  100% { transform: scale(0.9); opacity: 0.7; }
+}
+
+/* 2. 클래식 뮤직 라운지 모달 창 */
+.music-modal-window {
+  max-width: 620px;
+  width: 94%;
+  background: var(--color-bg-card);
+  border: 1px solid var(--color-border);
+  border-radius: 1.5rem;
+  box-shadow: var(--shadow-xl);
+  backdrop-filter: blur(16px);
+  overflow: hidden;
+}
+
+.music-modal-header {
+  padding: 1.4rem 1.6rem 1rem 1.6rem;
+  border-bottom: 1px solid var(--color-border);
+  position: relative;
+}
+
+.music-badge-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.25rem 0.65rem;
+  border-radius: 9999px;
+  background: var(--color-gold-soft);
+  color: var(--color-gold);
+  border: 1px solid var(--color-border-gold);
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.music-header-sub {
+  font-size: 0.85rem;
+  color: var(--color-text-muted);
+  margin-top: 0.3rem;
+  line-height: 1.4;
+}
+
+.music-modal-body {
+  padding: 1.4rem 1.6rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.4rem;
+  max-height: 70vh;
+  overflow-y: auto;
+}
+
+/* 플레이어 히어로 카드 */
+.music-hero-card {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  padding: 1.25rem 1.4rem;
+  background: var(--color-bg-subtle);
+  border: 1px solid var(--color-border);
+  border-radius: 1.2rem;
+  position: relative;
+  overflow: hidden;
+}
+
+/* LP 바이닐 레코드 비주얼 */
+.music-disc-visual {
+  flex-shrink: 0;
+}
+
+.music-album-art {
+  width: 90px;
+  height: 90px;
+  border-radius: 50%;
+  background: radial-gradient(circle, #27272a 0%, #09090b 70%, #000 100%);
+  border: 3px solid var(--color-gold);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.35);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+}
+
+.music-album-art.rotating {
+  animation: spinRecord 9s linear infinite;
+}
+
+@keyframes spinRecord {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+.music-disc-grooves {
+  position: absolute;
+  inset: 6px;
+  border-radius: 50%;
+  border: 1px dashed rgba(255, 255, 255, 0.15);
+  pointer-events: none;
+}
+
+.music-disc-center {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: var(--gradient-gold);
+  color: #1e1b4b;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.95rem;
+  box-shadow: inset 0 0 4px rgba(0, 0, 0, 0.4);
+}
+
+/* 히어로 메타 */
+.music-hero-meta {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.music-track-badge {
+  display: inline-block;
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: var(--color-gold);
+  margin-bottom: 0.2rem;
+}
+
+.music-current-title {
+  font-size: 1.15rem;
+  font-weight: 800;
+  color: var(--color-text-main);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  margin: 0;
+}
+
+.music-current-artist {
+  font-size: 0.85rem;
+  color: var(--color-text-muted);
+  margin: 0.15rem 0 0.8rem 0;
+}
+
+/* 프로그레스 바 */
+.music-progress-wrapper {
+  margin-bottom: 0.8rem;
+}
+
+.music-progress-container {
+  width: 100%;
+  height: 6px;
+  background: var(--color-border);
+  border-radius: 9999px;
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+}
+
+.music-progress-bar {
+  height: 100%;
+  width: 0%;
+  background: var(--gradient-gold);
+  border-radius: 9999px;
+  transition: width 0.1s linear;
+}
+
+.music-time-row {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.72rem;
+  color: var(--color-text-muted);
+  font-family: monospace;
+  font-weight: 600;
+  margin-top: 0.35rem;
+}
+
+/* 메인 컨트롤 */
+.music-controls-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  margin-bottom: 0.8rem;
+}
+
+.music-ctrl-btn {
+  width: 2.3rem;
+  height: 2.3rem;
+  border-radius: 50%;
+  border: 1px solid var(--color-border);
+  background: var(--color-bg-card);
+  color: var(--color-text-main);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.music-ctrl-btn:hover {
+  background: var(--color-bg-subtle);
+  border-color: var(--color-gold);
+  color: var(--color-gold);
+  transform: translateY(-1px);
+}
+
+.music-ctrl-btn.active {
+  background: var(--color-gold-soft);
+  border-color: var(--color-gold);
+  color: var(--color-gold);
+}
+
+.music-ctrl-btn.main-play-btn {
+  width: 2.8rem;
+  height: 2.8rem;
+  background: var(--gradient-gold);
+  color: #1e1b4b;
+  border: none;
+  font-size: 1.15rem;
+  box-shadow: 0 4px 12px rgba(180, 83, 9, 0.3);
+}
+
+.music-ctrl-btn.main-play-btn:hover {
+  transform: scale(1.08);
+  box-shadow: 0 6px 16px rgba(180, 83, 9, 0.4);
+  color: #000;
+}
+
+/* 볼륨 조절 */
+.music-volume-row {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+.music-vol-btn {
+  background: transparent;
+  border: none;
+  color: var(--color-text-muted);
+  font-size: 0.85rem;
+  cursor: pointer;
+  padding: 0.2rem;
+}
+
+.music-vol-btn:hover {
+  color: var(--color-primary);
+}
+
+.music-volume-slider {
+  flex: 1;
+  height: 4px;
+  -webkit-appearance: none;
+  appearance: none;
+  background: var(--color-border);
+  border-radius: 9999px;
+  outline: none;
+  cursor: pointer;
+}
+
+.music-volume-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: var(--color-gold);
+  cursor: pointer;
+  border: 2px solid #fff;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.3);
+}
+
+/* 3. 플레이리스트 섹션 */
+.music-playlist-section {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.music-playlist-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.music-playlist-header h4 {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--color-text-main);
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  margin: 0;
+}
+
+.music-playlist-count {
+  font-size: 0.75rem;
+  color: var(--color-text-muted);
+  font-weight: 600;
+}
+
+.music-playlist-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.music-track-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.75rem 0.9rem;
+  background: var(--color-bg-card);
+  border: 1px solid var(--color-border);
+  border-radius: 0.9rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.music-track-item:hover {
+  background: var(--color-bg-subtle);
+  border-color: var(--color-gold);
+  transform: translateX(3px);
+}
+
+.music-track-item.active {
+  background: var(--color-gold-soft);
+  border-color: var(--color-gold);
+  box-shadow: 0 2px 8px rgba(180, 83, 9, 0.15);
+}
+
+.music-track-left {
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+  min-width: 0;
+}
+
+.music-track-num {
+  font-size: 0.85rem;
+  font-weight: 800;
+  font-family: monospace;
+  color: var(--color-text-muted);
+  width: 1.5rem;
+}
+
+.music-track-item.active .music-track-num {
+  color: var(--color-gold);
+}
+
+.music-track-info {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.music-track-title {
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: var(--color-text-main);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.music-track-composer {
+  font-size: 0.75rem;
+  color: var(--color-text-muted);
+}
+
+.music-track-right {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex-shrink: 0;
+}
+
+.music-track-period-badge {
+  font-size: 0.72rem;
+  font-weight: 600;
+  padding: 0.2rem 0.5rem;
+  border-radius: 9999px;
+  background: var(--color-bg-subtle);
+  color: var(--color-text-muted);
+  border: 1px solid var(--color-border);
+}
+
+.music-track-play-indicator {
+  width: 1.8rem;
+  height: 1.8rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--color-text-muted);
+  font-size: 0.8rem;
+}
+
+.music-track-item.active .music-track-play-indicator {
+  color: var(--color-gold);
+}
+
+/* 이퀄라이저 애니메이션 바 */
+.music-eq-bar {
+  display: inline-block;
+  width: 3px;
+  height: 12px;
+  margin: 0 1px;
+  background: var(--color-gold);
+  border-radius: 2px;
+}
+
+.music-eq-bar.bar-1 { animation: eqBounce 0.6s infinite alternate ease; }
+.music-eq-bar.bar-2 { animation: eqBounce 0.4s infinite alternate ease 0.15s; }
+.music-eq-bar.bar-3 { animation: eqBounce 0.7s infinite alternate ease 0.3s; }
+
+@keyframes eqBounce {
+  0% { height: 4px; }
+  100% { height: 14px; }
+}
+
+.music-modal-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.9rem 1.6rem;
+  border-top: 1px solid var(--color-border);
+}
+
+.music-footer-note {
+  font-size: 0.78rem;
+  color: var(--color-text-muted);
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+/* 4. 테마별 커스터마이징 */
+html.theme-pastel .music-mini-btn.play-btn,
+html.theme-pastel .music-disc-center,
+html.theme-pastel .music-ctrl-btn.main-play-btn {
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  color: #fff;
+  box-shadow: 0 3px 10px rgba(16, 185, 129, 0.3);
+}
+
+html.theme-pastel .music-progress-bar {
+  background: linear-gradient(90deg, #10b981, #059669);
+}
+
+html.theme-pastel .wave-bar,
+html.theme-pastel .music-eq-bar {
+  background: #10b981;
+}
+
+html.theme-dark .music-mini-capsule {
+  background: rgba(15, 23, 42, 0.85);
+  border-color: rgba(245, 158, 11, 0.3);
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.5);
+}
+
+html.theme-dark .music-modal-window {
+  background: rgba(15, 23, 42, 0.95);
+  border-color: rgba(245, 158, 11, 0.35);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.8);
+}
+
+html.theme-dark .music-hero-card {
+  background: rgba(30, 41, 59, 0.7);
+  border-color: rgba(255, 255, 255, 0.1);
+}
+
+html.theme-dark .music-track-item {
+  background: rgba(30, 41, 59, 0.6);
+  border-color: rgba(255, 255, 255, 0.08);
+}
+
+html.theme-dark .music-track-item:hover {
+  background: rgba(30, 41, 59, 0.95);
+  border-color: var(--color-gold);
+}
+
+/* 5. 모바일 반응형 조절 */
+@media (max-width: 768px) {
+  .music-mini-capsule {
+    max-width: 100%;
+    order: 2;
+    margin-top: 0.3rem;
+  }
+  .music-hero-card {
+    flex-direction: column;
+    text-align: center;
+  }
+  .music-current-title, .music-current-artist {
+    text-align: center;
+  }
+  .music-controls-row {
+    justify-content: center;
+    gap: 0.8rem;
+  }
+  .music-modal-footer {
+    flex-direction: column;
+    gap: 0.8rem;
+  }
+  .music-footer-note {
+    text-align: center;
+  }
+}

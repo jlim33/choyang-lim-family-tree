@@ -178,8 +178,18 @@ const I18N_DICTIONARY = {
     toastBackupExported: "족보 데이터 백업 파일(JSON)을 다운로드했습니다.",
     toastCsvExported: "엑셀 호환 CSV 명부를 다운로드했습니다.",
     toastSampleRestored: "초기 가문 친척 데이터로 복원되었습니다.",
-    confirmDelete: "친척분의 인적 사항을 족보 명부에서 삭제하시겠습니까?",
-    confirmReset: "모든 데이터를 초기 7대 거점 샘플 데이터로 복원하시겠습니까? 현재 입력된 내용은 대체됩니다."
+    confirmDelete: "정말로 이 친척 정보를 명부에서 삭제하시겠습니까?",
+    confirmReset: "정말로 모든 데이터를 초기 샘플 데이터로 복원하시겠습니까? 현재 입력된 변경사항은 대체됩니다.",
+
+    // 클래식 뮤직 라운지
+    musicLoungeBadge: "Classic Best 5선",
+    musicLoungeTitle: "🎻 조양 임씨 클래식 뮤직 라운지",
+    musicLoungeDesc: "선조들의 숭고한 정신과 가문의 화합을 기리는 불멸의 클래식 명곡 마스터 사운드",
+    musicPlaylistTitle: "클래식 5선 명곡 목록",
+    musicTrackCount: "총 5곡 연속 스트리밍",
+    musicFooterTip: "가문 족보 열람 및 가계도 탐색 중에도 배경음악이 끊김 없이 연속 재생됩니다.",
+    musicContinuousBadge: "연속 자동 재생 중",
+    musicIdleBadge: "클래식 명곡 5선"
   },
 
   en: {
@@ -357,6 +367,16 @@ const I18N_DICTIONARY = {
     toastCsvExported: "Excel-compatible CSV directory has been downloaded.",
     toastSampleRestored: "Restored to initial 7-hub sample dataset.",
     confirmDelete: "Are you sure you want to delete this relative from the clan directory?",
-    confirmReset: "Reset all records to initial sample dataset? Current changes will be replaced."
+    confirmReset: "Reset all records to initial sample dataset? Current changes will be replaced.",
+
+    // Classic Music Lounge
+    musicLoungeBadge: "Classic Best 5 Masterpieces",
+    musicLoungeTitle: "🎻 Choyang Lim Classical Music Lounge",
+    musicLoungeDesc: "Master recordings of timeless classical masterpieces celebrating heritage and family unity",
+    musicPlaylistTitle: "Classic Best 5 Track List",
+    musicTrackCount: "5 Tracks Continuous Stream",
+    musicFooterTip: "Background music plays seamlessly while exploring genealogy records and the family tree.",
+    musicContinuousBadge: "Continuous Play",
+    musicIdleBadge: "Classic Best 5"
   }
 };

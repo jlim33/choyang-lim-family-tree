@@ -106,6 +106,7 @@ class ChoyangClanApp {
   // 다국어 전환 (KO / EN)
   setLanguage(lang, showNotification = true) {
     this.currentLang = lang === 'en' ? 'en' : 'ko';
+    window.currentLanguage = this.currentLang;
     localStorage.setItem(this.LANG_KEY, this.currentLang);
 
     const koBtn = document.getElementById('lang-btn-ko');
@@ -115,6 +116,10 @@ class ChoyangClanApp {
 
     this.applyTranslations();
     this.renderAll();
+
+    if (window.musicLounge) {
+      window.musicLounge.updateUI();
+    }
 
     if (showNotification) {
       const dict = I18N_DICTIONARY[this.currentLang];
