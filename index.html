@@ -395,7 +395,25 @@
               <label class="form-label" for="form-city">
                 <span data-i18n="formCity">거주 도시</span> <span class="opt-badge" data-i18n="badgeOptional">(선택)</span>
               </label>
-              <input type="text" id="form-city" class="form-control" placeholder="예: 전주, 용인, 토론토 등" autocomplete="off">
+              <input type="text" id="form-city" class="form-control" placeholder="예: 샌프란시스코, San Francisco, 전주, 토론토 등" data-i18n-placeholder="formCityPlaceholder" list="city-suggestions" autocomplete="off">
+              <datalist id="city-suggestions">
+                <option value="샌프란시스코">샌프란시스코 (San Francisco)</option>
+                <option value="San Francisco">San Francisco (샌프란시스코)</option>
+                <option value="버클리">버클리 (Berkeley)</option>
+                <option value="Berkeley">Berkeley (버클리)</option>
+                <option value="팔로 알토">팔로 알토 (Palo Alto)</option>
+                <option value="Palo Alto">Palo Alto (팔로 알토)</option>
+                <option value="엘에이">엘에이 (Los Angeles / LA)</option>
+                <option value="Los Angeles">Los Angeles (로스앤젤레스 / 엘에이)</option>
+                <option value="토론토">토론토 (Toronto)</option>
+                <option value="Toronto">Toronto (토론토)</option>
+                <option value="전주">전주 (Jeonju)</option>
+                <option value="용인">용인 (Yongin)</option>
+                <option value="서울">서울 (Seoul)</option>
+                <option value="Seoul">Seoul (서울)</option>
+                <option value="뉴욕">뉴욕 (New York)</option>
+                <option value="New York">New York (뉴욕)</option>
+              </datalist>
               <div class="quick-city-buttons">
                 <span style="font-size:0.75rem; color:var(--color-text-muted); align-self:center;" data-i18n="quickHubsLabel">7대거점:</span>
                 <button type="button" class="quick-city-btn" onclick="window.app.setFormCity('전주', '대한민국')">전주</button>

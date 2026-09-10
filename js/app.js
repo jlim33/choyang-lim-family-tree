@@ -68,6 +68,32 @@ class ChoyangClanApp {
       const saved = localStorage.getItem(this.STORAGE_KEY);
       if (saved) {
         this.relatives = JSON.parse(saved);
+        // 도시 기반 국가 자동 보정 (예: san francisco인데 대한민국으로 저장된 경우 미국으로 자동 보정)
+        this.relatives.forEach(r => {
+          if (r.city && (!r.country || r.country === '대한민국')) {
+            if (typeof isCityMatch === 'function') {
+              if (
+                isCityMatch(r.city, '샌프란시스코') ||
+                isCityMatch(r.city, '버클리') ||
+                isCityMatch(r.city, '팔로 알토') ||
+                isCityMatch(r.city, '엘에이') ||
+                isCityMatch(r.city, '뉴욕') ||
+                isCityMatch(r.city, '시애틀') ||
+                isCityMatch(r.city, '산호세') ||
+                isCityMatch(r.city, '시카고') ||
+                isCityMatch(r.city, '보스턴')
+              ) {
+                r.country = '미국';
+              } else if (
+                isCityMatch(r.city, '토론토') ||
+                isCityMatch(r.city, '밴쿠버') ||
+                isCityMatch(r.city, '몬트리올')
+              ) {
+                r.country = '캐나다';
+              }
+            }
+          }
+        });
       } else {
         this.relatives = [...INITIAL_RELATIVES_DATA];
         this.saveRelativesData();
@@ -242,10 +268,17 @@ class ChoyangClanApp {
 
     const totalCount = this.relatives.length;
     const countries = new Set(this.relatives.map(r => r.country).filter(Boolean));
-    const cities = new Set(this.relatives.map(r => r.city).filter(Boolean));
+    const distinctCities = new Set();
+    this.relatives.forEach(r => {
+      if (r.city && r.city.trim()) {
+        const canonical = typeof getCanonicalCity === 'function' ? getCanonicalCity(r.city) : r.city.trim();
+        distinctCities.add(canonical.toLowerCase());
+      }
+    });
 
-    const majorCities = MAJOR_HUBS.map(h => h.city);
-    const majorHubsCount = this.relatives.filter(r => majorCities.includes(r.city)).length;
+    const majorHubsCount = this.relatives.filter(r => {
+      return MAJOR_HUBS.some(h => typeof isCityMatch === 'function' ? isCityMatch(r.city, h.city) : r.city === h.city);
+    }).length;
 
     const elTotal = document.getElementById('stat-total-relatives');
     const elCountries = document.getElementById('stat-total-countries');
@@ -254,7 +287,7 @@ class ChoyangClanApp {
 
     if (elTotal) elTotal.textContent = `${totalCount}${dict.unitPeople}`;
     if (elCountries) elCountries.textContent = `${countries.size}${dict.unitCountries}`;
-    if (elCities) elCities.textContent = `${cities.size}${dict.unitCities}`;
+    if (elCities) elCities.textContent = `${distinctCities.size}${dict.unitCities}`;
     if (elHubs) elHubs.textContent = `${majorHubsCount}${dict.unitPeople}`;
   }
 
@@ -266,8 +299,16 @@ class ChoyangClanApp {
     const dict = I18N_DICTIONARY[isEn ? 'en' : 'ko'];
 
     container.innerHTML = MAJOR_HUBS.map(hub => {
-      const count = this.relatives.filter(r => r.city === hub.city).length;
-      const isActive = this.currentFilter.city === hub.city;
+      const count = this.relatives.filter(r => {
+        return typeof isCityMatch === 'function' 
+          ? isCityMatch(r.city, hub.city) 
+          : r.city === hub.city;
+      }).length;
+      const isActive = this.currentFilter.city !== 'all' && (
+        typeof isCityMatch === 'function' 
+          ? isCityMatch(this.currentFilter.city, hub.city) 
+          : this.currentFilter.city === hub.city
+      );
       const cityName = isEn ? hub.cityEn : hub.city;
       const countryName = isEn ? hub.countryEn : hub.country;
 
@@ -285,7 +326,12 @@ class ChoyangClanApp {
   }
 
   handleHubClick(cityName) {
-    if (this.currentFilter.city === cityName) {
+    const isCurrentlyActive = this.currentFilter.city !== 'all' && (
+      typeof isCityMatch === 'function' 
+        ? isCityMatch(this.currentFilter.city, cityName) 
+        : this.currentFilter.city === cityName
+    );
+    if (isCurrentlyActive) {
       this.clearCityFilter();
     } else {
       this.filterByCity(cityName);
@@ -354,9 +400,12 @@ class ChoyangClanApp {
     const dict = I18N_DICTIONARY[isEn ? 'en' : 'ko'];
 
     if (this.currentFilter.city !== 'all') {
+      const displayCity = isEn && typeof getCityDisplayName === 'function' 
+        ? getCityDisplayName(this.currentFilter.city, 'en') 
+        : this.currentFilter.city;
       badgeContainer.innerHTML = `
         <div class="active-filter-badge">
-          <span>${dict.activeFilterHubPrefix} <strong>${this.currentFilter.city}</strong></span>
+          <span>${dict.activeFilterHubPrefix} <strong>${displayCity}</strong></span>
           <span class="active-filter-clear" onclick="window.app.clearCityFilter()" title="Clear">&times;</span>
         </div>
       `;
@@ -433,11 +482,17 @@ class ChoyangClanApp {
 
     const q = this.currentFilter.keyword.toLowerCase().trim();
     const filtered = this.relatives.filter(item => {
-      if (this.currentFilter.country !== 'all' && item.country !== this.currentFilter.country) {
-        return false;
+      if (this.currentFilter.country !== 'all') {
+        const matchesCountry = item.country === this.currentFilter.country || 
+          (this.currentFilter.country === '미국' && (item.country === 'USA' || item.country === 'United States')) ||
+          (this.currentFilter.country === 'USA' && (item.country === '미국' || item.country === 'United States'));
+        if (!matchesCountry) return false;
       }
-      if (this.currentFilter.city !== 'all' && item.city !== this.currentFilter.city) {
-        return false;
+      if (this.currentFilter.city !== 'all') {
+        const matchesCity = typeof isCityMatch === 'function' 
+          ? isCityMatch(item.city, this.currentFilter.city) 
+          : item.city === this.currentFilter.city;
+        if (!matchesCity) return false;
       }
       if (q) {
         const snsValues = item.sns ? Object.values(item.sns).join(' ') : '';
@@ -479,7 +534,7 @@ class ChoyangClanApp {
     const isEn = this.currentLang === 'en';
     const dict = I18N_DICTIONARY[isEn ? 'en' : 'ko'];
 
-    const isMajor = MAJOR_HUBS.some(h => h.city === rel.city);
+    const isMajor = MAJOR_HUBS.some(h => typeof isCityMatch === 'function' ? isCityMatch(h.city, rel.city) : h.city === rel.city);
     const flag = rel.country === '대한민국' || rel.country === 'South Korea' ? '🇰🇷' : rel.country === '미국' || rel.country === 'USA' ? '🇺🇸' : rel.country === '캐나다' || rel.country === 'Canada' ? '🇨🇦' : '🌐';
 
     // 프로필 아바타 (사진 또는 성씨)
@@ -605,7 +660,7 @@ class ChoyangClanApp {
           </thead>
           <tbody>
             ${relatives.map(rel => {
-              const isMajor = MAJOR_HUBS.some(h => h.city === rel.city);
+              const isMajor = MAJOR_HUBS.some(h => typeof isCityMatch === 'function' ? isCityMatch(h.city, rel.city) : h.city === rel.city);
               const flag = rel.country === '대한민국' || rel.country === 'South Korea' ? '🇰🇷' : rel.country === '미국' || rel.country === 'USA' ? '🇺🇸' : rel.country === '캐나다' || rel.country === 'Canada' ? '🇨🇦' : '🌐';
               
               const sns = rel.sns || {};
@@ -753,7 +808,7 @@ class ChoyangClanApp {
     const isEn = this.currentLang === 'en';
     const dict = I18N_DICTIONARY[isEn ? 'en' : 'ko'];
 
-    const isMajor = MAJOR_HUBS.some(h => h.city === rel.city);
+    const isMajor = MAJOR_HUBS.some(h => typeof isCityMatch === 'function' ? isCityMatch(h.city, rel.city) : h.city === rel.city);
     const flag = rel.country === '대한민국' || rel.country === 'South Korea' ? '🇰🇷' : rel.country === '미국' || rel.country === 'USA' ? '🇺🇸' : rel.country === '캐나다' || rel.country === 'Canada' ? '🇨🇦' : '🌐';
 
     // 포트레이트 아바타
@@ -882,12 +937,40 @@ class ChoyangClanApp {
       website: document.getElementById('form-sns-website').value.trim()
     };
 
+    const rawCity = document.getElementById('form-city').value.trim();
+    let countryVal = document.getElementById('form-country').value.trim();
+
+    // 도시 입력값 기반 국가 자동 보정 (사용자가 도시만 'san francisco' 등으로 넣고 국가를 기본값 '대한민국'으로 둔 경우)
+    if (!countryVal || countryVal === '대한민국') {
+      if (typeof isCityMatch === 'function') {
+        if (
+          isCityMatch(rawCity, '샌프란시스코') || 
+          isCityMatch(rawCity, '버클리') || 
+          isCityMatch(rawCity, '팔로 알토') || 
+          isCityMatch(rawCity, '엘에이') || 
+          isCityMatch(rawCity, '뉴욕') || 
+          isCityMatch(rawCity, '시애틀') || 
+          isCityMatch(rawCity, '산호세') || 
+          isCityMatch(rawCity, '시카고') || 
+          isCityMatch(rawCity, '보스턴')
+        ) {
+          countryVal = '미국';
+        } else if (
+          isCityMatch(rawCity, '토론토') || 
+          isCityMatch(rawCity, '밴쿠버') || 
+          isCityMatch(rawCity, '몬트리올')
+        ) {
+          countryVal = '캐나다';
+        }
+      }
+    }
+
     const relativeData = {
       name: nameVal,
       email: emailVal,
       photo: this.currentPhotoData || '',
-      country: document.getElementById('form-country').value.trim() || '대한민국',
-      city: document.getElementById('form-city').value.trim(),
+      country: countryVal || '대한민국',
+      city: rawCity,
       phone: document.getElementById('form-phone').value.trim(),
       address: document.getElementById('form-address').value.trim(),
       workplace: document.getElementById('form-workplace').value.trim(),

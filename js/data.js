@@ -3,27 +3,223 @@
  * 7대 거점 좌표 사전 및 부모 성명, 프로필 사진, 각종 SNS가 연동된 샘플 데이터
  */
 
-// 주요 도시 및 7대 핵심 거점 위도/경도 좌표 사전
+// 주요 도시 및 7대 핵심 거점 위도/경도 좌표 사전 (한글 및 영문/약어 동시 지원)
 const CITY_COORDINATES = {
+  // 대한민국
   '전주': { lat: 35.8242, lng: 127.1480, country: '대한민국', countryEn: 'South Korea', isMajorHub: true },
+  'jeonju': { lat: 35.8242, lng: 127.1480, country: '대한민국', countryEn: 'South Korea', isMajorHub: true },
   '용인': { lat: 37.2411, lng: 127.1776, country: '대한민국', countryEn: 'South Korea', isMajorHub: true },
+  'yongin': { lat: 37.2411, lng: 127.1776, country: '대한민국', countryEn: 'South Korea', isMajorHub: true },
   '서울': { lat: 37.5665, lng: 126.9780, country: '대한민국', countryEn: 'South Korea', isMajorHub: false },
+  'seoul': { lat: 37.5665, lng: 126.9780, country: '대한민국', countryEn: 'South Korea', isMajorHub: false },
   '부산': { lat: 35.1796, lng: 129.0756, country: '대한민국', countryEn: 'South Korea', isMajorHub: false },
+  'busan': { lat: 35.1796, lng: 129.0756, country: '대한민국', countryEn: 'South Korea', isMajorHub: false },
   '대전': { lat: 36.3504, lng: 127.3845, country: '대한민국', countryEn: 'South Korea', isMajorHub: false },
+  'daejeon': { lat: 36.3504, lng: 127.3845, country: '대한민국', countryEn: 'South Korea', isMajorHub: false },
   '광주': { lat: 35.1595, lng: 126.8526, country: '대한민국', countryEn: 'South Korea', isMajorHub: false },
+  'gwangju': { lat: 35.1595, lng: 126.8526, country: '대한민국', countryEn: 'South Korea', isMajorHub: false },
   '대구': { lat: 35.8714, lng: 128.6014, country: '대한민국', countryEn: 'South Korea', isMajorHub: false },
+  'daegu': { lat: 35.8714, lng: 128.6014, country: '대한민국', countryEn: 'South Korea', isMajorHub: false },
   '인천': { lat: 37.4563, lng: 126.7052, country: '대한민국', countryEn: 'South Korea', isMajorHub: false },
+  'incheon': { lat: 37.4563, lng: 126.7052, country: '대한민국', countryEn: 'South Korea', isMajorHub: false },
+  '수원': { lat: 37.2636, lng: 127.0286, country: '대한민국', countryEn: 'South Korea', isMajorHub: false },
+  'suwon': { lat: 37.2636, lng: 127.0286, country: '대한민국', countryEn: 'South Korea', isMajorHub: false },
+
+  // 캐나다
   '토론토': { lat: 43.6532, lng: -79.3832, country: '캐나다', countryEn: 'Canada', isMajorHub: true },
+  'toronto': { lat: 43.6532, lng: -79.3832, country: '캐나다', countryEn: 'Canada', isMajorHub: true },
   '밴쿠버': { lat: 49.2827, lng: -123.1207, country: '캐나다', countryEn: 'Canada', isMajorHub: false },
+  'vancouver': { lat: 49.2827, lng: -123.1207, country: '캐나다', countryEn: 'Canada', isMajorHub: false },
+  '몬트리올': { lat: 45.5017, lng: -73.5673, country: '캐나다', countryEn: 'Canada', isMajorHub: false },
+  'montreal': { lat: 45.5017, lng: -73.5673, country: '캐나다', countryEn: 'Canada', isMajorHub: false },
+
+  // 미국
   '샌프란시스코': { lat: 37.7749, lng: -122.4194, country: '미국', countryEn: 'USA', isMajorHub: true },
+  'san francisco': { lat: 37.7749, lng: -122.4194, country: '미국', countryEn: 'USA', isMajorHub: true },
+  'sanfrancisco': { lat: 37.7749, lng: -122.4194, country: '미국', countryEn: 'USA', isMajorHub: true },
+  'sf': { lat: 37.7749, lng: -122.4194, country: '미국', countryEn: 'USA', isMajorHub: true },
+  'san francisco, ca': { lat: 37.7749, lng: -122.4194, country: '미국', countryEn: 'USA', isMajorHub: true },
+  'san francisco ca': { lat: 37.7749, lng: -122.4194, country: '미국', countryEn: 'USA', isMajorHub: true },
+  'bay area': { lat: 37.7749, lng: -122.4194, country: '미국', countryEn: 'USA', isMajorHub: true },
+
   '버클리': { lat: 37.8716, lng: -122.2727, country: '미국', countryEn: 'USA', isMajorHub: true },
+  'berkeley': { lat: 37.8716, lng: -122.2727, country: '미국', countryEn: 'USA', isMajorHub: true },
+  'berkeley, ca': { lat: 37.8716, lng: -122.2727, country: '미국', countryEn: 'USA', isMajorHub: true },
+
   '팔로 알토': { lat: 37.4419, lng: -122.1430, country: '미국', countryEn: 'USA', isMajorHub: true },
   '팔로알토': { lat: 37.4419, lng: -122.1430, country: '미국', countryEn: 'USA', isMajorHub: true },
+  'palo alto': { lat: 37.4419, lng: -122.1430, country: '미국', countryEn: 'USA', isMajorHub: true },
+  'paloalto': { lat: 37.4419, lng: -122.1430, country: '미국', countryEn: 'USA', isMajorHub: true },
+  'palo alto, ca': { lat: 37.4419, lng: -122.1430, country: '미국', countryEn: 'USA', isMajorHub: true },
+
   '엘에이': { lat: 34.0522, lng: -118.2437, country: '미국', countryEn: 'USA', isMajorHub: true },
   '로스앤젤레스': { lat: 34.0522, lng: -118.2437, country: '미국', countryEn: 'USA', isMajorHub: true },
+  '로스엔젤레스': { lat: 34.0522, lng: -118.2437, country: '미국', countryEn: 'USA', isMajorHub: true },
+  'los angeles': { lat: 34.0522, lng: -118.2437, country: '미국', countryEn: 'USA', isMajorHub: true },
+  'losangeles': { lat: 34.0522, lng: -118.2437, country: '미국', countryEn: 'USA', isMajorHub: true },
+  'la': { lat: 34.0522, lng: -118.2437, country: '미국', countryEn: 'USA', isMajorHub: true },
+  'los angeles, ca': { lat: 34.0522, lng: -118.2437, country: '미국', countryEn: 'USA', isMajorHub: true },
+
   '뉴욕': { lat: 40.7128, lng: -74.0060, country: '미국', countryEn: 'USA', isMajorHub: false },
-  '시애틀': { lat: 47.6062, lng: -122.3321, country: '미국', countryEn: 'USA', isMajorHub: false }
+  'new york': { lat: 40.7128, lng: -74.0060, country: '미국', countryEn: 'USA', isMajorHub: false },
+  'newyork': { lat: 40.7128, lng: -74.0060, country: '미국', countryEn: 'USA', isMajorHub: false },
+  'nyc': { lat: 40.7128, lng: -74.0060, country: '미국', countryEn: 'USA', isMajorHub: false },
+
+  '시애틀': { lat: 47.6062, lng: -122.3321, country: '미국', countryEn: 'USA', isMajorHub: false },
+  'seattle': { lat: 47.6062, lng: -122.3321, country: '미국', countryEn: 'USA', isMajorHub: false },
+
+  '산호세': { lat: 37.3382, lng: -121.8863, country: '미국', countryEn: 'USA', isMajorHub: false },
+  'san jose': { lat: 37.3382, lng: -121.8863, country: '미국', countryEn: 'USA', isMajorHub: false },
+  'sanjose': { lat: 37.3382, lng: -121.8863, country: '미국', countryEn: 'USA', isMajorHub: false },
+
+  '시카고': { lat: 41.8781, lng: -87.6298, country: '미국', countryEn: 'USA', isMajorHub: false },
+  'chicago': { lat: 41.8781, lng: -87.6298, country: '미국', countryEn: 'USA', isMajorHub: false },
+
+  '보스턴': { lat: 42.3601, lng: -71.0589, country: '미국', countryEn: 'USA', isMajorHub: false },
+  'boston': { lat: 42.3601, lng: -71.0589, country: '미국', countryEn: 'USA', isMajorHub: false }
 };
+
+// 도시 정규화 매핑 사전
+const CITY_CANONICAL_MAP = {
+  '샌프란시스코': '샌프란시스코',
+  'san francisco': '샌프란시스코',
+  'sanfrancisco': '샌프란시스코',
+  'sf': '샌프란시스코',
+  'san francisco, ca': '샌프란시스코',
+  'san francisco ca': '샌프란시스코',
+  'bay area': '샌프란시스코',
+
+  '버클리': '버클리',
+  'berkeley': '버클리',
+  'berkeley, ca': '버클리',
+
+  '팔로 알토': '팔로 알토',
+  '팔로알토': '팔로 알토',
+  'palo alto': '팔로 알토',
+  'paloalto': '팔로 알토',
+  'palo alto, ca': '팔로 알토',
+
+  '엘에이': '엘에이',
+  '로스앤젤레스': '엘에이',
+  '로스엔젤레스': '엘에이',
+  'los angeles': '엘에이',
+  'losangeles': '엘에이',
+  'la': '엘에이',
+
+  '토론토': '토론토',
+  'toronto': '토론토',
+
+  '밴쿠버': '밴쿠버',
+  'vancouver': '밴쿠버',
+
+  '전주': '전주',
+  'jeonju': '전주',
+
+  '용인': '용인',
+  'yongin': '용인',
+
+  '서울': '서울',
+  'seoul': '서울',
+
+  '부산': '부산',
+  'busan': '부산',
+
+  '뉴욕': '뉴욕',
+  'new york': '뉴욕',
+  'nyc': '뉴욕',
+
+  '시애틀': '시애틀',
+  'seattle': '시애틀',
+
+  '산호세': '산호세',
+  'san jose': '산호세'
+};
+
+// 도시 표준명 추출 함수
+function getCanonicalCity(cityName) {
+  if (!cityName) return '';
+  const trimmed = cityName.toString().trim();
+  const lower = trimmed.toLowerCase();
+
+  if (CITY_CANONICAL_MAP[lower]) {
+    return CITY_CANONICAL_MAP[lower];
+  }
+
+  const stripped = lower.replace(/[\s,_-]+/g, '');
+  for (const [k, v] of Object.entries(CITY_CANONICAL_MAP)) {
+    if (k.replace(/[\s,_-]+/g, '') === stripped) {
+      return v;
+    }
+  }
+
+  if (typeof MAJOR_HUBS !== 'undefined') {
+    const hub = MAJOR_HUBS.find(h => {
+      const hCity = h.city.toLowerCase().replace(/[\s,_-]+/g, '');
+      const hCityEn = h.cityEn.toLowerCase().replace(/[\s,_-]+/g, '');
+      return hCity === stripped || hCityEn === stripped;
+    });
+    if (hub) return hub.city;
+  }
+
+  for (const [k, v] of Object.entries(CITY_CANONICAL_MAP)) {
+    if (lower.includes(k) && k.length >= 2) {
+      return v;
+    }
+  }
+
+  return trimmed;
+}
+
+// 두 도시명이 동일한지 판별 (한글/영문/대소문자/약어 무관)
+function isCityMatch(city1, city2) {
+  if (!city1 || !city2) return false;
+  if (city1 === city2) return true;
+
+  const s1 = city1.toString().toLowerCase().trim().replace(/[\s,_-]+/g, '');
+  const s2 = city2.toString().toLowerCase().trim().replace(/[\s,_-]+/g, '');
+  if (s1 === s2) return true;
+
+  const c1 = getCanonicalCity(city1);
+  const c2 = getCanonicalCity(city2);
+  if (c1 && c2 && c1 === c2) return true;
+
+  const cs1 = c1.toLowerCase().replace(/[\s,_-]+/g, '');
+  const cs2 = c2.toLowerCase().replace(/[\s,_-]+/g, '');
+  if (cs1 === cs2) return true;
+
+  if (typeof MAJOR_HUBS !== 'undefined') {
+    const findHub = (name) => {
+      const target = name.toString().toLowerCase().trim().replace(/[\s,_-]+/g, '');
+      const canon = getCanonicalCity(name).toLowerCase().replace(/[\s,_-]+/g, '');
+      return MAJOR_HUBS.find(h => {
+        const hc = h.city.toLowerCase().replace(/[\s,_-]+/g, '');
+        const he = h.cityEn.toLowerCase().replace(/[\s,_-]+/g, '');
+        const hi = (h.id || '').toLowerCase();
+        return hc === target || he === target || hi === target || hc === canon || he === canon;
+      });
+    };
+
+    const h1 = findHub(city1);
+    const h2 = findHub(city2);
+    if (h1 && h2 && h1.id === h2.id) return true;
+  }
+
+  return false;
+}
+
+// 사용자 표시용 도시명 (현재 언어에 따라 표시)
+function getCityDisplayName(cityName, lang = 'ko') {
+  if (!cityName) return '';
+  const canonical = getCanonicalCity(cityName);
+  if (typeof MAJOR_HUBS !== 'undefined') {
+    const hub = MAJOR_HUBS.find(h => isCityMatch(h.city, canonical) || isCityMatch(h.city, cityName));
+    if (hub) {
+      return lang === 'en' ? hub.cityEn : hub.city;
+    }
+  }
+  return cityName;
+}
+
 
 // 7대 핵심 거점 메타 정보
 const MAJOR_HUBS = [

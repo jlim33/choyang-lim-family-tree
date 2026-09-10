@@ -49,34 +49,45 @@ class ClanMapManager {
 
     const cityGroups = {};
 
-    relatives.forEach(rel => {
-      const city = rel.city ? rel.city.trim() : (isEn ? 'Undisclosed' : '미지정');
-      if (city === '미지정' || city === 'Undisclosed') return;
-
-      if (!cityGroups[city]) {
-        cityGroups[city] = {
-          city: city,
-          country: rel.country || (isEn ? 'South Korea' : '대한민국'),
-          relatives: [],
-          coords: this.resolveCityCoords(city, rel.country)
-        };
-      }
-      cityGroups[city].relatives.push(rel);
+    // 1. 7대 주요 거점 기본 보장 등록
+    MAJOR_HUBS.forEach(hub => {
+      cityGroups[hub.city] = {
+        city: hub.city,
+        cityEn: hub.cityEn,
+        country: hub.country,
+        relatives: [],
+        coords: { lat: hub.lat, lng: hub.lng, isMajorHub: true }
+      };
     });
 
-    // 7대 주요 거점 보장
-    MAJOR_HUBS.forEach(hub => {
-      const cityName = hub.city;
-      if (!cityGroups[cityName]) {
-        cityGroups[cityName] = {
-          city: cityName,
-          country: hub.country,
-          relatives: [],
-          coords: { lat: hub.lat, lng: hub.lng, isMajorHub: true }
-        };
-      } else {
-        cityGroups[cityName].coords.isMajorHub = true;
+    // 2. 친척별 정규화 도시 매핑 및 집계
+    relatives.forEach(rel => {
+      const rawCity = rel.city ? rel.city.trim() : '';
+      if (!rawCity || rawCity === '미지정' || rawCity === 'Undisclosed') return;
+
+      const canonicalCity = typeof getCanonicalCity === 'function' ? getCanonicalCity(rawCity) : rawCity;
+
+      // 기존 등록된 그룹(7대 거점 포함) 중 매칭 탐색
+      let targetKey = null;
+      for (const key of Object.keys(cityGroups)) {
+        if (key === canonicalCity || (typeof isCityMatch === 'function' && isCityMatch(key, canonicalCity))) {
+          targetKey = key;
+          break;
+        }
       }
+
+      if (!targetKey) {
+        targetKey = canonicalCity;
+        cityGroups[targetKey] = {
+          city: canonicalCity,
+          cityEn: typeof getCityDisplayName === 'function' ? getCityDisplayName(canonicalCity, 'en') : canonicalCity,
+          country: rel.country || (isEn ? 'South Korea' : '대한민국'),
+          relatives: [],
+          coords: this.resolveCityCoords(canonicalCity, rel.country)
+        };
+      }
+
+      cityGroups[targetKey].relatives.push(rel);
     });
 
     // 마커 생성 및 지도에 추가
@@ -119,7 +130,10 @@ class ClanMapManager {
   }
 
   getEnCityName(city) {
-    const hub = MAJOR_HUBS.find(h => h.city === city);
+    if (typeof getCityDisplayName === 'function') {
+      return getCityDisplayName(city, 'en');
+    }
+    const hub = MAJOR_HUBS.find(h => typeof isCityMatch === 'function' ? isCityMatch(h.city, city) : h.city === city);
     return hub ? hub.cityEn : city;
   }
 
@@ -131,8 +145,20 @@ class ClanMapManager {
     if (CITY_COORDINATES[cleanName]) {
       return CITY_COORDINATES[cleanName];
     }
+    const lower = cleanName.toLowerCase();
+    if (CITY_COORDINATES[lower]) {
+      return CITY_COORDINATES[lower];
+    }
+
+    const canonical = typeof getCanonicalCity === 'function' ? getCanonicalCity(cleanName) : cleanName;
+    if (CITY_COORDINATES[canonical]) {
+      return CITY_COORDINATES[canonical];
+    }
 
     for (const [key, coords] of Object.entries(CITY_COORDINATES)) {
+      if (typeof isCityMatch === 'function' && isCityMatch(key, cleanName)) {
+        return coords;
+      }
       if (cleanName.includes(key) || key.includes(cleanName)) {
         return coords;
       }
@@ -151,6 +177,7 @@ class ClanMapManager {
     const isMajor = !!group.coords.isMajorHub;
     const flag = group.country === '대한민국' || group.country === 'South Korea' ? '🇰🇷' : group.country === '미국' || group.country === 'USA' ? '🇺🇸' : group.country === '캐나다' || group.country === 'Canada' ? '🇨🇦' : '🌐';
     const displayCity = isEn ? (this.getEnCityName(group.city) || group.city) : group.city;
+    const displayCountry = isEn ? (group.country === '미국' ? 'USA' : group.country === '대한민국' ? 'South Korea' : group.country === '캐나다' ? 'Canada' : group.country) : (group.country === 'USA' ? '미국' : group.country === 'South Korea' ? '대한민국' : group.country === 'Canada' ? '캐나다' : group.country);
     
     let relativesListHtml = '';
     if (group.relatives.length === 0) {
@@ -167,7 +194,7 @@ class ClanMapManager {
     return `
       <div class="map-popup-card">
         <div class="map-popup-header">
-          <h4>${flag} ${group.country} · ${displayCity}</h4>
+          <h4>${flag} ${displayCountry} · ${displayCity}</h4>
           <p>${isMajor ? (dict.mapPopupHubBadge || '★ 가문 핵심 7대 거점') : (dict.mapPopupNormalBadge || '친족 거주지')} (${dict.mapPopupResidents || '거주 친척'}: <strong>${group.relatives.length}${dict.unitPeople || '명'}</strong>)</p>
         </div>
         <div class="map-popup-body">
@@ -185,8 +212,12 @@ class ClanMapManager {
   }
 
   flyToCity(cityName) {
-    if (!this.map) return;
-    const hub = MAJOR_HUBS.find(h => h.city === cityName || h.cityEn === cityName || h.id === cityName);
+    if (!this.map || !cityName) return;
+    const hub = MAJOR_HUBS.find(h => 
+      typeof isCityMatch === 'function' 
+        ? isCityMatch(h.city, cityName) || isCityMatch(h.cityEn, cityName)
+        : (h.city === cityName || h.cityEn === cityName || h.id === cityName)
+    );
     if (hub) {
       this.map.flyTo([hub.lat, hub.lng], hub.zoom, { duration: 1.2 });
       return;
