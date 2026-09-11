@@ -328,7 +328,7 @@
         <button type="button" class="modal-close-btn" onclick="window.app.closeModal('relative-edit-modal')" aria-label="닫기">&times;</button>
       </div>
 
-      <form id="relative-form" onsubmit="return window.app.saveRelativeForm(event)">
+      <form id="relative-form" novalidate onsubmit="return window.app.saveRelativeForm(event)">
         <div class="modal-body">
           
           <!-- ★ 프로필 사진 업로드 영역 (선택) -->
@@ -362,16 +362,16 @@
               <label class="form-label" for="form-name">
                 <span data-i18n="formName">성명 (이름)</span> <span class="req-badge" data-i18n="badgeRequired">*필수</span>
               </label>
-              <input type="text" id="form-name" class="form-control" placeholder="예: 임종원" required autocomplete="off">
+              <input type="text" id="form-name" class="form-control" placeholder="예: 임종원 또는 Justin Lim" required autocomplete="off">
               <span class="field-error-text" id="name-error"></span>
             </div>
 
-            <!-- 필수: 이메일 주소 -->
+            <!-- 선택: 이메일 주소 -->
             <div class="form-group">
               <label class="form-label" for="form-email">
-                <span data-i18n="formEmail">이메일 주소</span> <span class="req-badge" data-i18n="badgeRequired">*필수</span>
+                <span data-i18n="formEmail">이메일 주소</span> <span class="opt-badge" data-i18n="badgeOptional">(선택)</span>
               </label>
-              <input type="email" id="form-email" class="form-control" placeholder="예: choyang@domain.com" required autocomplete="off">
+              <input type="email" id="form-email" class="form-control" placeholder="예: choyang@domain.com (선택 사항)" autocomplete="off">
               <span class="field-error-text" id="email-error"></span>
             </div>
 
@@ -520,8 +520,8 @@
             <div class="form-group full-width" style="border-top: 1px dashed var(--color-border); padding-top: 1rem; margin-top: 0.5rem; background: var(--color-gold-soft); padding: 0.85rem; border-radius: var(--radius-sm); border: 1px solid var(--color-border-gold);">
               <label class="form-label" for="form-parent-name" style="color:var(--color-primary); font-size:0.95rem;">
                 <i class="fa-solid fa-people-roof" style="color:var(--color-gold);"></i>
-                <span data-i18n="formParentName">부모 성명 (가계도 연결 필수 입력)</span>
-                <span class="req-badge" style="font-size:0.8rem;" data-i18n="badgeRequired">*가계도연결</span>
+                <span data-i18n="formParentName">부모 성명 (가계도 연결용)</span>
+                <span class="opt-badge" style="font-size:0.8rem;" data-i18n="badgeOptional">(선택)</span>
               </label>
               <input type="text" id="form-parent-name" class="form-control" placeholder="예: 임한식, 임종원, 임성택 등 (기존 등록 친척 자동완성)" list="parent-name-options" autocomplete="off">
               <datalist id="parent-name-options">

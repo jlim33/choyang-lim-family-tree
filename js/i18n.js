@@ -111,7 +111,7 @@ const I18N_DICTIONARY = {
 
     // 모달: 등록 / 수정
     modalAddTitle: "새로운 친척 인적사항 등록",
-    modalAddSub: "이름과 이메일은 필수이며, 사진과 SNS 등 원하시는 정보를 자유롭게 입력하세요.",
+    modalAddSub: "성명(이름)만 필수이며, 거주 도시, 사진, SNS 등 원하시는 정보를 자유롭게 입력하세요.",
     modalEditTitle: "친척 인적사항 수정",
     modalEditSub: "친척분의 사진, SNS 및 프로필 정보를 수정합니다.",
 
@@ -132,7 +132,7 @@ const I18N_DICTIONARY = {
     formJobTitle: "직책 / 담당 업무",
     formWorkAddress: "회사 (직장) 주소",
     formNotes: "기타 항목 (항렬, 촌수/가계 관계, 특이사항 메모)",
-    formParentName: "부모 성명 (가계도 연결 필수 입력)",
+    formParentName: "부모 성명 (가계도 연결용)",
     formParentHelper: "가계도(Family Tree Hierarchy) 연결에 사용됩니다. 기존 등록된 부모님의 이름을 선택하거나 직접 입력하세요.",
 
     // SNS 필드
@@ -300,7 +300,7 @@ const I18N_DICTIONARY = {
 
     // Modal: Add / Edit
     modalAddTitle: "Register New Relative",
-    modalAddSub: "Name and email are mandatory. You can optionally add a portrait photo, social media, and parent's name.",
+    modalAddSub: "Only Full Name is required. Residence city, portrait photo, and social media are optional.",
     modalEditTitle: "Edit Relative Information",
     modalEditSub: "Update portrait photo, social media, and profile details.",
 
@@ -321,7 +321,7 @@ const I18N_DICTIONARY = {
     formJobTitle: "Job Title / Role",
     formWorkAddress: "Company Address",
     formNotes: "Notes (Generation, Family branch, Special remarks)",
-    formParentName: "Parent's Name (Required for Family Tree Hierarchy)",
+    formParentName: "Parent's Name (for Family Tree Lineage)",
     formParentHelper: "Used to build the Family Tree Hierarchy. Select an existing relative or type the parent's full name.",
 
     // SNS Fields

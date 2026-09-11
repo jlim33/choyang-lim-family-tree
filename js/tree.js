@@ -77,8 +77,11 @@ class FamilyTreeManager {
     const childrenMap = new Map();
 
     this.relatives.forEach(r => {
-      nameMap.set(r.name.trim(), r);
-      childrenMap.set(r.name.trim(), []);
+      const name = (r.name || '').trim();
+      if (name) {
+        nameMap.set(name, r);
+        childrenMap.set(name, []);
+      }
     });
 
     const roots = [];

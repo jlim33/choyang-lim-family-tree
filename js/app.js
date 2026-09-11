@@ -68,8 +68,11 @@ class ChoyangClanApp {
       const saved = localStorage.getItem(this.STORAGE_KEY);
       if (saved) {
         this.relatives = JSON.parse(saved);
-        // 도시 기반 국가 자동 보정 (예: san francisco인데 대한민국으로 저장된 경우 미국으로 자동 보정)
+        // 도시 기반 국가 자동 보정 및 Justin Lim 영문 성명 동기화
         this.relatives.forEach(r => {
+          if (r.id === 'rel-7' && r.name === '임재형') {
+            r.name = '임재형 (Justin Lim)';
+          }
           if (r.city && (!r.country || r.country === '대한민국')) {
             if (typeof isCityMatch === 'function') {
               if (
@@ -105,7 +108,21 @@ class ChoyangClanApp {
   }
 
   saveRelativesData() {
-    localStorage.setItem(this.STORAGE_KEY, JSON.stringify(this.relatives));
+    try {
+      localStorage.setItem(this.STORAGE_KEY, JSON.stringify(this.relatives));
+    } catch (e) {
+      console.warn('localStorage 저장 용량 초과 감지, 사진 압축 후 재저장 시도:', e);
+      try {
+        // 대용량 사진 데이터 경량화 후 재저장
+        const optimized = this.relatives.map(r => ({
+          ...r,
+          photo: r.photo && r.photo.length > 50000 ? '' : r.photo
+        }));
+        localStorage.setItem(this.STORAGE_KEY, JSON.stringify(optimized));
+      } catch (fatalErr) {
+        console.error('localStorage 최종 저장 실패:', fatalErr);
+      }
+    }
   }
 
   // ★ 3가지 디자인 테마 전환 (royal: 클래식 골드, pastel: 모던 파스텔, dark: 미드나잇 다크)
@@ -429,15 +446,53 @@ class ChoyangClanApp {
     this.renderRelativesList();
   }
 
-  // ★ 사진 파일 업로드 처리 (FileReader Base64 변환)
+  // ★ 사진 파일 업로드 처리 (Canvas 기반 자동 리사이징 & 압축하여 localStorage 용량 초과 방지)
   handlePhotoUpload(event) {
     const file = event.target.files && event.target.files[0];
     if (!file) return;
 
     const reader = new FileReader();
     reader.onload = (e) => {
-      this.currentPhotoData = e.target.result;
-      this.updatePhotoPreview(this.currentPhotoData);
+      const rawDataUrl = e.target.result;
+      const img = new Image();
+      img.onload = () => {
+        try {
+          const MAX_DIM = 320;
+          let width = img.width;
+          let height = img.height;
+          if (width > height) {
+            if (width > MAX_DIM) {
+              height = Math.round((height * MAX_DIM) / width);
+              width = MAX_DIM;
+            }
+          } else {
+            if (height > MAX_DIM) {
+              width = Math.round((width * MAX_DIM) / height);
+              height = MAX_DIM;
+            }
+          }
+
+          const canvas = document.createElement('canvas');
+          canvas.width = width;
+          canvas.height = height;
+          const ctx = canvas.getContext('2d');
+          ctx.drawImage(img, 0, 0, width, height);
+
+          // 20~30KB 내외의 가벼운 고화질 JPEG로 압축
+          const compressed = canvas.toDataURL('image/jpeg', 0.8);
+          this.currentPhotoData = compressed;
+          this.updatePhotoPreview(this.currentPhotoData);
+        } catch (err) {
+          console.warn('Canvas 압축 실패, 원본 사용:', err);
+          this.currentPhotoData = rawDataUrl;
+          this.updatePhotoPreview(this.currentPhotoData);
+        }
+      };
+      img.onerror = () => {
+        this.currentPhotoData = rawDataUrl;
+        this.updatePhotoPreview(this.currentPhotoData);
+      };
+      img.src = rawDataUrl;
     };
     reader.readAsDataURL(file);
   }
@@ -829,7 +884,7 @@ class ChoyangClanApp {
     `;
 
     document.getElementById('detail-parent').textContent = rel.parentName || (isEn ? 'Ancestor / Patriarch Lineage' : '선조 / 최상위 세대');
-    document.getElementById('detail-email').innerHTML = `<a href="mailto:${rel.email}">${this.escapeHtml(rel.email)}</a>`;
+    document.getElementById('detail-email').innerHTML = rel.email ? `<a href="mailto:${rel.email}">${this.escapeHtml(rel.email)}</a>` : `<span style="color:#94a3b8;">${dict.notRegistered}</span>`;
     document.getElementById('detail-phone').innerHTML = rel.phone ? `<a href="tel:${rel.phone}">${this.escapeHtml(rel.phone)}</a>` : `<span style="color:#94a3b8;">${dict.notRegistered}</span>`;
     document.getElementById('detail-address').textContent = rel.address || dict.notRegistered;
     document.getElementById('detail-workplace').textContent = [rel.workplace, rel.jobTitle].filter(Boolean).join(' · ') || dict.notRegistered;
@@ -915,10 +970,8 @@ class ChoyangClanApp {
       hasError = true;
     }
 
-    if (!emailVal) {
-      this.showFieldError('form-email', 'email-error', dict.errEmailRequired);
-      hasError = true;
-    } else if (!this.isValidEmail(emailVal)) {
+    // 이메일은 선택 사항이며, 입력했을 때만 유효성 검사 수행
+    if (emailVal && !this.isValidEmail(emailVal)) {
       this.showFieldError('form-email', 'email-error', dict.errEmailInvalid);
       hasError = true;
     }

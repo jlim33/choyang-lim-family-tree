@@ -470,7 +470,7 @@ const INITIAL_RELATIVES_DATA = [
   },
   {
     id: 'rel-7',
-    name: '임재형',
+    name: '임재형 (Justin Lim)',
     parentName: '임성택',
     generation: 29,
     photo: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=300&auto=format&fit=crop&q=80',
@@ -483,7 +483,7 @@ const INITIAL_RELATIVES_DATA = [
     jobTitle: 'Managing Partner (대표 파트너)',
     workAddress: 'Financial District, San Francisco, CA',
     birthday: '1979-05-28',
-    notes: '29대손 (임성택 교수의 장남), 실리콘밸리 및 SF 한인 벤처 투자 협회 이사',
+    notes: '29대손 (임성택 교수의 장남, Justin Lim), 실리콘밸리 및 SF 한인 벤처 투자 협회 이사',
     sns: {
       linkedin: 'https://linkedin.com/in/justin-im-vc',
       twitter: 'justinim_vc'
