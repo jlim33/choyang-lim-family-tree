@@ -4,6 +4,8 @@
   "description": "Choyang Lim Clan Genealogy, Family Tree Hierarchy & Global Map Web App",
   "main": "index.html",
   "scripts": {
+    "build": "echo 'Static build complete'",
+    "vercel-build": "echo 'Static build complete'",
     "start": "npx serve ."
   },
   "keywords": [

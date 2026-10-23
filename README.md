@@ -81,9 +81,19 @@ Family Tree/
 └── README.md           # 본 안내 문서
 ```
 
+## 🌐 라이브 웹사이트 (Live Demo)
+
+- **GitHub Pages**: [https://jlim33.github.io/choyang-lim-family-tree/](https://jlim33.github.io/choyang-lim-family-tree/)
+- **Vercel**: [https://choyang-lim-family-tree.vercel.app/](https://choyang-lim-family-tree.vercel.app/)
+
 ---
 
-## 🚀 실행 방법
+## 🚀 실행 및 배포 방법
 
+### 1. 로컬 실행
 별도의 서버 설치나 복잡한 명령어 없이, **`index.html` 파일을 더블 클릭하여 크롬(Chrome), 엣지(Edge), 사파리(Safari) 등 웹 브라우저에서 바로 실행**하실 수 있습니다.
-가족 및 친척분들에게 폴더 전체를 전달하시거나, 웹 호스팅(GitHub Pages, Vercel 등)에 업로드하여 전 세계 친척들이 함께 접속하도록 운영하실 수 있습니다.
+
+### 2. GitHub Pages 배포
+본 저장소에는 GitHub Actions 자동 배포 워크플로우(`.github/workflows/deploy.yml`)가 포함되어 있어, `main` 브랜치에 푸시하면 자동으로 GitHub Pages에 배포됩니다.
+- GitHub 저장소 **Settings** > **Pages** > **Build and deployment**의 Source를 **GitHub Actions**로 설정하시면 수 초 내에 라이브로 서비스됩니다.
+
